@@ -76,42 +76,54 @@ def down_text(chapter_id, headers):
         f"http://rehaofan.jingluo.love/content?item_id={chapter_id}"
     ]
     
+    # 随机选择一个API
+    primary_api, fallback_api = random.sample(api_endpoints, 2)
+    
     while retry_count < max_retries:
         try:
-            # 随机选择一个API
-            api_url = random.choice(api_endpoints)
-            
             # 添加随机延迟
             time.sleep(random.uniform(1, 3))
             
-            response = requests.get(api_url, headers=headers, timeout=CONFIG["request_timeout"])
+            # 主API
+            response = requests.get(primary_api, headers=headers, timeout=CONFIG["request_timeout"])
             data = response.json()
             
-            if data.get("code") == 0 or data.get("err_no") == 0:
+            if data.get("code") == 0:
                 content = data.get("data", {}).get("content", "")
                 if not content:
-                    content = data.get("data", {}).get("article", {}).get("content", "")
+                    # 备用API
+                    response = requests.get(fallback_api, headers=headers, timeout=CONFIG["request_timeout"])
+                    data = response.json()
+                    if data.get("code") == 0:
+                        content = data.get("data", {}).get("content", "")
                 
-                # 清理HTML标签并保留段落结构
-                content = re.sub(r'<header>.*?</header>', '', content, flags=re.DOTALL)
-                content = re.sub(r'<footer>.*?</footer>', '', content, flags=re.DOTALL)
-                content = re.sub(r'</?article>', '', content)
-                content = re.sub(r'<p idx="\d+">', '\n', content)
-                content = re.sub(r'</p>', '\n', content)
-                content = re.sub(r'<[^>]+>', '', content)
-                content = re.sub(r'\\u003c|\\u003e', '', content)
-                content = re.sub(r'\n{2,}', '\n', content).strip()
-                content = '\n'.join(['    ' + line if line.strip() else line for line in content.split('\n')])
-                break
+                if content:
+                    # 清理HTML标签并保留段落结构
+                    content = re.sub(r'<header>.*?</header>', '', content, flags=re.DOTALL)
+                    content = re.sub(r'<footer>.*?</footer>', '', content, flags=re.DOTALL)
+                    content = re.sub(r'</?article>', '', content)
+                    content = re.sub(r'<p idx="\d+">', '\n', content)
+                    content = re.sub(r'</p>', '\n', content)
+                    content = re.sub(r'<[^>]+>', '', content)
+                    content = re.sub(r'\\u003c|\\u003e', '', content)
+                    content = re.sub(r'\n{2,}', '\n', content).strip()
+                    content = '\n'.join(['    ' + line if line.strip() else line for line in content.split('\n')])
+                    break
                 
         except requests.exceptions.RequestException as e:
             retry_count += 1
             print(f"网络请求失败，正在重试({retry_count}/{max_retries}): {str(e)}")
             time.sleep(2 * retry_count)
+            
+            # 在重试时切换API
+            primary_api, fallback_api = fallback_api, primary_api
         except Exception as e:
             retry_count += 1
             print(f"下载出错，正在重试({retry_count}/{max_retries}): {str(e)}")
             time.sleep(1 * retry_count)
+            
+            # 在重试时切换API
+            primary_api, fallback_api = fallback_api, primary_api
     
     return content if content else None
 
