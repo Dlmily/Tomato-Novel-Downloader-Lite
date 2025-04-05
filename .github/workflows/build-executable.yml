@@ -48,7 +48,7 @@ jobs:
             --collect-data fake_useragent \
             --name=TomatoNovelDownloader-Linux_amd64-$VERSION \
             --clean \
-            main.py
+            2.py
       
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
@@ -97,7 +97,7 @@ jobs:
             --collect-data fake_useragent \
             --name=TomatoNovelDownloader-Linux_arm64-$VERSION \
             --clean \
-            main.py
+            2.py
       
       - name: Upload Linux ARM64 Artifact
         uses: actions/upload-artifact@v4
@@ -155,7 +155,7 @@ jobs:
             --collect-data fake_useragent `
             --name=TomatoNovelDownloader-Win64-$version `
             --clean `
-            main.py
+            2.py
       
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
@@ -204,37 +204,10 @@ jobs:
             --collect-data fake_useragent \
             --name=TomatoNovelDownloader-macOS_arm64-$VERSION \
             --clean \
-            main.py
+            2.py
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
           path: dist/TomatoNovelDownloader-macOS_arm64-*
-
-  publish-release:
-    needs: [build-linux, build-linux-arm64, build-windows, build-macos]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: release-artifacts
-
-      - name: List Artifacts
-        run: ls -R release-artifacts
-
-      - name: Create Unified Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: |
-            release-artifacts/linux-build/TomatoNovelDownloader-Linux_amd64-*
-            release-artifacts/linux-arm64-build/TomatoNovelDownloader-Linux_arm64-*
-            release-artifacts/windows-build/TomatoNovelDownloader-Win64-*.exe
-            release-artifacts/macos-build/TomatoNovelDownloader-macOS_arm64-*
