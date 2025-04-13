@@ -14,12 +14,18 @@ from tqdm import tqdm
 from collections import OrderedDict
 from fake_useragent import UserAgent
 from typing import Optional, Dict
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
-from Crypto.Random import get_random_bytes
 import base64
 import gzip
 from urllib.parse import urlencode
+
+try:
+    from Crypto.Cipher import AES
+    from Crypto.Util.Padding import pad, unpad
+    from Crypto.Random import get_random_bytes
+except:
+    from Cryptodome.Cipher import AES
+    from Cryptodome.Util.Padding import pad, unpad
+    from Cryptodome.Random import get_random_bytes
 
 # 禁用SSL证书验证警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
