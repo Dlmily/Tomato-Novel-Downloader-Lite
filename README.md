@@ -8,7 +8,7 @@
 sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-main stable main@' $PREFIX/etc/apt/sources.list
 apt update && apt upgrade
 pkg install python
-pip install requests beautifulsoup4 lxml tqdm fake-useragent
+pip install -r ./requirements.txt
 ```
 ## 常见问题
 1.`此程序的优势在哪？`
