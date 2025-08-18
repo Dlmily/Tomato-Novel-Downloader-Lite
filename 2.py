@@ -355,10 +355,13 @@ def down_text(chapter_id, headers, book_id=None):
                 
                 try:
                     data = response.json()
-                    if data.get("code") == 0:
-                        content = data.get("data", {}).get(chapter_id, {}).get("content", "")
+                    if data.get("data", {}).get("code") in ["0", 0]:
+                        content = data.get("data", {}).get("data", {}).get("content", "")
+                        title = data.get("data", {}).get("data", {}).get("title", "")
                         if content:
-                            return "", process_chapter_content(content)
+                            processed_content = process_chapter_content(content)
+                            processed = re.sub(r'^(\s*)', r'    ', processed_content, flags=re.MULTILINE)
+                            return title, processed
                 except:
                     continue
 
@@ -626,7 +629,8 @@ def Run(book_id, save_path, file_format='txt'):
                             content = content.get("content", "")
                         
                         if content:
-                            processed = process_chapter_content(content)
+                            processed_content = process_chapter_content(content)
+                            processed = re.sub(r'^(\s*)', r'    ', processed_content, flags=re.MULTILINE)
                             with lock:
                                 chapter_results[chap["index"]] = {
                                     "base_title": chap["title"],
