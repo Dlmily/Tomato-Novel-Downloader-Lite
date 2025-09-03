@@ -289,6 +289,9 @@ def down_text(chapter_id, headers, book_id=None):
         current_endpoint = endpoint["url"]
         api_name = endpoint["name"]
         
+        if api_name == "qyuing":
+            continue
+
         try:
             time.sleep(random.uniform(0.1, 0.5))
             
