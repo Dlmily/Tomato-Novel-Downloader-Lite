@@ -214,21 +214,7 @@ CFLAGS="-O0" pip install lxml
 
 4.`我是纯小白，2.py代码在哪里下载啊`
 
-直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到2.py代码，点击下载即可。
-<details>
-<summary>第2种下载方案(点击展开查看)
-</summary>
-
-- 第一步
-  
-![Screenshot_20250608-204406](https://github.com/user-attachments/assets/5357457c-92d8-4b15-af38-6cdad23c57a1)
-- 第二步
-
-![Screenshot_20250608-204442](https://github.com/user-attachments/assets/2d349eb3-8b3b-44a6-9188-264b7fbb658f)
-- 第三步
-
-![Screenshot_20250608-204456](https://github.com/user-attachments/assets/cd50b5b8-a07b-4f44-b46c-e8f2e8ea8008)
-</details>
+直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到2.py代码和api.py代码，点击下载即可。
 
 5.`我无法正常运行代码，有没有可执行文件代替？`
 
@@ -238,7 +224,7 @@ CFLAGS="-O0" pip install lxml
 
 6.`怎么中断程序？`
 
-Ctrl+C中断程序（先按Ctrl再按C，多试几次就能中断程序了）
+Ctrl+C然后再Ctrl+Z中断程序（先按Ctrl再按C/Z)
 
 7.`Tor网络怎么使用`
 
@@ -324,11 +310,9 @@ Ctrl+C中断程序（先按Ctrl再按C，多试几次就能中断程序了）
 ## 注意事项（必看）
 由于使用的是api，所以未来不知道有哪一天突然失效，如果真的出现了，请立即在“Issues”页面中回复！
 
-如果您在使用本程序的时候出现了下载章节失败的情况，也许并不是api失效了，可能是因为调用api人数过多，导致api暂时关闭，如果遇到了这种情况，请稍后再试，另外，您需要下载的小说api可能会因没有更新所以下载失败。
+如果您在使用本程序的时候出现了下载章节失败的情况，请关闭vpn或其他网络代理，这可能并不是api失效了，可能是因为调用api人数过多，导致api暂时关闭，如果遇到了这种情况，请稍后再试，另外，您需要下载的小说api可能会因没有更新所以下载失败。
 
 千万不要想着耍小聪明：“欸，我改一下线程数不就能快速下载了吗？”请打消这种念头！因为这样会加大服务器压力！！！
-
-在v1.6.3.2版本以后已经可以使用vpn或其他网络代理了，之前的版本依旧不能使用！
 
 如果您也没有遇到以上的这种情况，请检查要下载的小说章节数量有多少，不建议大于1000章！如果真的出现了这种情况，可以先中断程序，再运行程序
 
@@ -367,6 +351,8 @@ Ctrl+C中断程序（先按Ctrl再按C，多试几次就能中断程序了）
 感谢来自Gmail用户@Deivid Zubi的api！
 
 感谢来自Github用户@lnb0X的api！
+
+感谢来自Github用户@lnb0X的[项目](https://github.com/lnb0X/python_fanqie_api_batch_full)！
 
 感谢来自Github用户@zyh6663的cookie！
 
