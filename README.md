@@ -365,6 +365,8 @@ cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
 
 感谢来自Github用户@lnb0X的api！
 
+感谢来自Github用户@divo-s的api代码基础！
+
 感谢来自Github用户@lnb0X的[项目](https://github.com/lnb0X/python_fanqie_api_batch_full)！
 
 感谢来自Github用户@zyh6663的cookie！
