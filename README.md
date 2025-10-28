@@ -10,7 +10,7 @@ api开发者和本程序的权益，1.7正式版之后的版本将进入“半�
 >
 >4.项目开发者有时会玩失踪
 
-如你所见，这个程序只有不到29kb的python文件，但这不影响它的功能！这个程序简单易操作，可以满足你的小说下载需求，需要运行此程序的话，最好是在终端中，以下的所有需要输入的内容都需要在终端中进行，并且在使用此程序之前，您必须先安装python！
+如你所见，这个程序只有不到45kb的python文件，但这不影响它的功能！这个程序简单易操作，可以满足你的小说下载需求，需要运行此程序的话，最好是在终端中，以下的所有需要输入的内容都需要在终端中进行，并且在使用此程序之前，您必须先安装python！
 ## 我该如何使用？
 <details>
 <summary>手机端(点击展开查看)</summary>
@@ -49,7 +49,7 @@ pkg install libxml2 libxslt
 ```
 
 ```
-pip install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib
+pip install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib aiohttp pyyaml unzip
 ```
 
 **注：在运行安装命令的时候，您可能会遇到“Do you want to continue? \[Y/n\]”这种情况，这时请输入大写的“Y”并回车来继续下载。**
@@ -85,7 +85,7 @@ python 2.py
    - 输入以下命令安装所需库：
 
      ```bash
-     pip install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib
+     pip install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib unzip pyyaml aiohttp
      ```
 
 4. **运行程序**
@@ -125,7 +125,7 @@ python 2.py
    - 输入以下命令：
 
      ```bash
-     pip3 install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib
+     pip3 install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib unzip aiohttp pyyaml
      ```
 
 4. **运行程序**
@@ -170,7 +170,7 @@ python 2.py
    - 输入以下命令：
 
      ```bash
-     pip3 install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib
+     pip3 install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib unzip pyyaml aiohttp
      ```
 
 4. **运行程序**
@@ -214,7 +214,8 @@ CFLAGS="-O0" pip install lxml
 
 4.`我是纯小白，2.py代码在哪里下载啊`
 
-直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到2.py代码和api.py代码，点击下载即可。
+- 在此页面上面的文件列表里进行下载 2.py 和 api.py
+- 或直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到 2.py 和 api.py，点击下载即可。
 
 5.`我无法正常运行代码，有没有可执行文件代替？`
 
@@ -226,7 +227,19 @@ CFLAGS="-O0" pip install lxml
 
 Ctrl+C然后再Ctrl+Z中断程序（先按Ctrl再按C/Z)
 
-7.`Tor网络怎么使用`
+7.`我该怎么调整段落间的行数？`
+
+使用你的文件管理器打开2.py文件去编辑，找到
+```
+cleaned_content = "\n".join(p.strip() for p in paragraphs if p.strip())
+```
+这段代码，将其替换为
+```
+cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
+```
+就可以添加一行行距了
+
+8.`Tor网络怎么使用`
 
 > 适用于旧版本
 
