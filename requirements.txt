@@ -8,3 +8,6 @@ stem
 urllib3
 lxml
 ebooklib
+unzip
+pyyaml
+aiohttp
