@@ -214,8 +214,10 @@ CFLAGS="-O0" pip install lxml
 
 4.`我是纯小白，2.py代码在哪里下载啊`
 
-- 在此页面上面的文件列表里进行下载 2.py 和 api.py
-- 或直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到 2.py 和 api.py，点击下载即可。
+> 如果您处在1.9预发布版本及以上的版本，还需要额外下载api.py！(常见问题五)
+
+- 在此页面上面的文件列表里进行下载 2.py。
+- 或直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到 2.py ，点击下载即可。
 
 5.`怎么启用官方api？`
 
