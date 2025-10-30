@@ -217,17 +217,21 @@ CFLAGS="-O0" pip install lxml
 - 在此页面上面的文件列表里进行下载 2.py 和 api.py
 - 或直接点击[此链接](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases/ )，先找到最新版本，然后在最新版本中找到”Assets”并点击来展开内容(如果已展开就不必进行此操作)。在展开的内容中找到 2.py 和 api.py，点击下载即可。
 
-5.`我无法正常运行代码，有没有可执行文件代替？`
+5.`怎么启用官方api？`
+
+由于服务器原因限制，不得不将其独立为一个文件进行使用。如果您想要使用官方api，请在下载 2.py 或其他可执行文件时下载 api.py，并让它与 2.py 或其他可执行文件处在同一个目录中，接着运行 2.py 或其他可执行文件即可使用官方api
+
+6.`我无法正常运行代码，有没有可执行文件代替？`
 
 [点击此处跳转到可执行文件安装页面](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases)
 
 然后再重新尝试
 
-6.`怎么中断程序？`
+7.`怎么中断程序？`
 
-Ctrl+C然后再Ctrl+Z中断程序（先按Ctrl再按C/Z)
+Ctrl+C中断程序（先按Ctrl再按C。从1.9预发布版本开始，一般情况下不建议使用Ctrl+Z）
 
-7.`我该怎么调整段落间的行数？`
+8.`我该怎么调整段落间的行数？`
 
 使用你的文件管理器打开2.py文件去编辑，找到
 ```
@@ -239,7 +243,7 @@ cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
 ```
 就可以添加一行行距了
 
-8.`Tor网络怎么使用`
+9.`Tor网络怎么使用`
 
 > 适用于旧版本
 
