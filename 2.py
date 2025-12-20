@@ -10,16 +10,11 @@ import threading
 import atexit
 import signal
 import sys
-import importlib.util
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
-from collections import OrderedDict
 from fake_useragent import UserAgent
-from typing import Optional, Dict
+from typing import Dict
 from ebooklib import epub
-import base64
-import gzip
-from urllib.parse import urlencode
 import subprocess
 import socket
 
@@ -30,25 +25,11 @@ requests.packages.urllib3.disable_warnings()
 # 全局配置
 CONFIG = {
     "max_workers": 4,
-    "max_retries": 3,
     "request_timeout": 15,
     "status_file": "chapter.json",
-    "request_rate_limit": 0.4,
-    "auth_token": "wcnmd91jb",
-    "server_url": "https://dlbkltos.s7123.xyz:5080",
-    "api_endpoints": [],
-    "batch_config": {
-        "name": "qyuing",
-        "base_url": None,
-        "batch_endpoint": None,
-        "token": None,
-        "max_batch_size": 250,
-        "timeout": 15,
-        "enabled": True
-    },
     "official_api": {
         "enabled": False,
-        "batch_endpoint": "http://127.0.0.1:8080/content",
+        "batch_endpoint": "http://0.0.0.0/content",
         "max_batch_size": 30,
         "timeout": 30
     }
@@ -169,90 +150,6 @@ def get_headers() -> Dict[str, str]:
         "Content-Type": "application/json"
     }
 
-def fetch_api_endpoints_from_server():
-    """从服务器获取API列表"""
-    try:
-        headers = get_headers()
-        headers["X-Auth-Token"] = CONFIG["auth_token"]
-        
-        # 获取人机验证url
-        challenge_url = f"{CONFIG['server_url']}/api/get-captcha-challenge"
-        challenge_res = make_request(
-            challenge_url,
-            headers=headers,
-            timeout=10,
-            verify=False
-        )
-        
-        if challenge_res.status_code != 200:
-            with print_lock:
-                print(f"获取人机验证挑战失败: {challenge_res.status_code}")
-            return False
-            
-        challenge_data = challenge_res.json()
-        captcha_url = challenge_data["challenge_url"]
-        
-        with print_lock:
-            print("\n" + "="*50)
-            print("需要进行人机验证才能继续")
-            print("请访问以下链接完成验证:")
-            print(captcha_url)
-            print("="*50 + "\n")
-            
-            verification_token = input("请粘贴验证后获取的令牌: ").strip()
-        
-        # 使用令牌获取api
-        headers["X-Verification-Token"] = verification_token
-        
-        sources_url = f"{CONFIG['server_url']}/api/sources"
-        response = make_request(
-            sources_url,
-            headers=headers,
-            timeout=10,
-            verify=False
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            sources = data.get("sources", [])
-            
-            CONFIG["api_endpoints"] = []
-            
-            for source in sources:
-                if source["enabled"]:
-                    if source["name"] == CONFIG["batch_config"]["name"]:
-                        single_url = source["single_url"]
-                        base_url = single_url.split('?')[0]
-                        batch_endpoint = base_url.split('/')[-1]
-                        base_url = base_url.rsplit('/', 1)[0]
-                        
-                        CONFIG["batch_config"]["base_url"] = base_url
-                        CONFIG["batch_config"]["batch_endpoint"] = f"/{batch_endpoint}"
-                        CONFIG["batch_config"]["token"] = source.get("token", "")
-                        CONFIG["batch_config"]["enabled"] = True
-                        CONFIG["api_endpoints"].append({
-                            "url": single_url,
-                            "name": source["name"]
-                        })
-                    else:
-                        endpoint = {"url": source["single_url"], "name": source["name"]}
-                        if source["name"] == "fanqie_sdk":
-                            endpoint["params"] = source.get("params", {})
-                            endpoint["data"] = source.get("data", {})
-                        CONFIG["api_endpoints"].append(endpoint)
-            
-            with print_lock:
-                print("成功从服务器获取API列表!")
-            return True
-        else:
-            with print_lock:
-                print(f"获取API列表失败，状态码: {response.status_code}")
-            return False
-    except Exception as e:
-        with print_lock:
-            print(f"获取API列表异常: {str(e)}")
-        return False
-
 def extract_chapters(soup):
     """解析章节列表"""
     chapters = []
@@ -280,50 +177,6 @@ def extract_chapters(soup):
             "index": idx
         })
     return chapters
-
-def batch_download_chapters(item_ids, headers):
-    """批量下载章节内容"""
-    # 如果官方API启用，使用官方API
-    if CONFIG["official_api"]["enabled"]:
-        return batch_download_chapters_official(item_ids, headers)
-    
-    if not CONFIG["batch_config"]["enabled"] or CONFIG["batch_config"]["name"] != "qyuing":
-        with print_lock:
-            print("批量下载功能仅限qyuing API")
-        return None
-        
-    batch_config = CONFIG["batch_config"]
-    url = f"{batch_config['base_url']}{batch_config['batch_endpoint']}"
-    
-    try:
-        batch_headers = headers.copy()
-        if batch_config["token"]:
-            batch_headers["token"] = batch_config["token"]
-        batch_headers["Content-Type"] = "application/json"
-        
-        payload = {"item_ids": item_ids}
-        response = make_request(
-            url,
-            headers=batch_headers,
-            method='POST',
-            data=payload,
-            timeout=batch_config["timeout"],
-            verify=False
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            if isinstance(data, dict) and "data" in data:
-                return data["data"]
-            return data
-        else:
-            with print_lock:
-                print(f"批量下载失败，状态码: {response.status_code}")
-            return None
-    except Exception as e:
-        with print_lock:
-            print(f"批量下载异常: {str(e)}")
-        return None
 
 def batch_download_chapters_official(item_ids, headers):
     """官方API批量下载章节内容"""
@@ -398,8 +251,7 @@ def process_chapter_content(content):
         return str(content)
 
 def down_text(chapter_id, headers, book_id=None):
-    """下载单个章节内容 - 已弃用"""
-    # 如果官方API启用，尝试使用官方API下载
+    """下载单个章节内容"""
     if CONFIG["official_api"]["enabled"]:
         batch_data = batch_download_chapters_official([chapter_id], headers)
         if batch_data and chapter_id in batch_data:
@@ -409,117 +261,9 @@ def down_text(chapter_id, headers, book_id=None):
                 processed_content = process_chapter_content(content)
                 processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
                 return title, processed
-    
-    # 如果没有启用官方API或官方API失败，使用其他API
-    for endpoint in CONFIG["api_endpoints"]:
-        current_endpoint = endpoint["url"]
-        api_name = endpoint["name"]
-        
-        if api_name == "qyuing":
-            continue
 
-        try:
-            time.sleep(random.uniform(0.1, 0.5))
-            
-            if api_name == "fanqie_sdk":
-                params = endpoint.get("params", {"sdk_type": "4", "novelsdk_aid": "638505"})
-                data = {
-                    "item_id": chapter_id,
-                    "need_book_info": 1,
-                    "show_picture": 1,
-                    "sdk_type": 1
-                }
-                
-                response = make_request(
-                    current_endpoint,
-                    headers=headers.copy(),
-                    params=params,
-                    method='POST',
-                    data=data,
-                    timeout=CONFIG["request_timeout"],
-                    verify=False
-                )
-                
-                if response.status_code != 200:
-                    continue
-                
-                try:
-                    data = response.json()
-                    content = data.get("data", {}).get("content", "")
-                    title = data.get("data", {}).get("title", "")
-                    if content:
-                        processed_content = process_chapter_content(content)
-                        processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                        return title, processed
-                except json.JSONDecodeError:
-                    continue
-
-            elif api_name == "fqweb":
-                response = make_request(
-                    current_endpoint.format(chapter_id=chapter_id),
-                    headers=headers.copy(),
-                    timeout=CONFIG["request_timeout"],
-                    verify=False
-                )
-                
-                try:
-                    data = response.json()
-                    if data.get("data", {}).get("code") in ["0", 0]:
-                        content = data.get("data", {}).get("data", {}).get("content", "")
-                        title = data.get("data", {}).get("data", {}).get("title", "")
-                        if content:
-                            processed_content = process_chapter_content(content)
-                            processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                            return title, processed
-                except:
-                    continue
-
-            elif api_name == "qyuing":
-                response = make_request(
-                    current_endpoint.format(chapter_id=chapter_id),
-                    headers=headers.copy(),
-                    timeout=CONFIG["request_timeout"],
-                    verify=False
-                )
-                
-                try:
-                    data = response.json()
-                    if data.get("data", {}).get("code") in ["0", 0]:
-                        content = data.get("data", {}).get("data", {}).get("content", "")
-                        title = data.get("data", {}).get("data", {}).get("title", "")
-                        if content:
-                            processed_content = process_chapter_content(content)
-                            processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                            return title, processed
-                except:
-                    continue
-
-            elif api_name == "lsjk":
-                response = make_request(
-                    current_endpoint.format(chapter_id=chapter_id),
-                    headers=headers.copy(),
-                    timeout=CONFIG["request_timeout"],
-                    verify=False
-                )
-                
-                if response.text:
-                    try:
-                        paragraphs = re.findall(r'<p idx="\d+">(.*?)</p>', response.text)
-                        cleaned = "\n".join(p.strip() for p in paragraphs if p.strip())
-                        formatted = '\n'.join('　　' + line if line.strip() else line 
-                                            for line in cleaned.split('\n'))
-                        return "", formatted
-                    except:
-                        continue
-
-        except Exception as e:
-            with print_lock:
-                print(f"API {api_name} 请求异常: {str(e)[:50]}...，尝试切换")
-            time.sleep(0.5)
-            continue
-    
     with print_lock:
-        print(f"章节 {chapter_id} 所有API均失败")
+        print(f"未启用官方 API 或官方 API 获取失败。章节 {chapter_id} 获取失败。")
     return None, None
 
 def get_chapters_from_api(book_id, headers):
@@ -925,50 +669,6 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
             write_downloaded_chapters_in_order()
             save_status(save_path, downloaded)
 
-        # qyuing批量下载 <- 保持原来的单线程批量下载
-        elif CONFIG["batch_config"]["enabled"] and CONFIG["batch_config"]["name"] == "qyuing":
-            print("正在使用qyuing API批量下载！响应慢是正常现象。")
-            batch_size = CONFIG["batch_config"]["max_batch_size"]
-            
-            with tqdm(total=len(todo_chapters), desc="批量下载进度") as pbar:
-                for i in range(0, len(todo_chapters), batch_size):
-                    batch = todo_chapters[i:i + batch_size]
-                    item_ids = [chap["id"] for chap in batch]
-                    
-                    batch_results = batch_download_chapters(item_ids, headers)
-                    if not batch_results:
-                        with print_lock:
-                            print(f"第 {i//batch_size + 1} 批下载失败")
-                        failed_chapters.extend(batch)
-                        pbar.update(len(batch))
-                        continue
-                    
-                    for chap in batch:
-                        content = batch_results.get(chap["id"], "")
-                        if isinstance(content, dict):
-                            content = content.get("content", "")
-                        
-                        if content:
-                            processed_content = process_chapter_content(content)
-                            processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                            with lock:
-                                chapter_results[chap["index"]] = {
-                                    "base_title": chap["title"],
-                                    "api_title": "",
-                                    "content": processed
-                                }
-                                downloaded.add(chap["id"])
-                                success_count += 1
-                        else:
-                            with lock:
-                                failed_chapters.append(chap)
-                        pbar.update(1)
-
-            todo_chapters = failed_chapters.copy()
-            failed_chapters = []
-            write_downloaded_chapters_in_order()
-            save_status(save_path, downloaded)
-
         # 单章补充下载
         if todo_chapters:
             print(f"开始单章下载模式，剩余 {len(todo_chapters)} 个章节...")
@@ -1060,7 +760,7 @@ def main():
     try:
         print("""欢迎使用番茄小说下载器精简版！
   开发者：Dlmily
-  当前版本：v1.9（预发布。服务器中api大批量瘫痪，因此尽量不要使用服务器api，静等修复）
+  当前版本：v1.9
   Github：https://github.com/Dlmily/Tomato-Novel-Downloader-Lite
   赞助/了解新产品：https://afdian.com/a/dlbaokanluntanos
   *使用前须知*：
@@ -1076,14 +776,11 @@ def main():
                 CONFIG["official_api"]["enabled"] = True
                 print("官方API已启用")
             else:
-                print("官方API启用失败，将使用服务器API")
-                CONFIG["official_api"]["enabled"] = False
-        else:
-            CONFIG["official_api"]["enabled"] = False
-            print("正在从服务器获取API列表...")
-            if not fetch_api_endpoints_from_server():
-                print("无法获取API列表，请重试！")
+                print("官方API启用失败，请检查 api.py 或环境后重试")
                 return
+        else:
+            print("当前程序仅支持官方API，目前暂时放弃对第三方API的使用。程序退出。")
+            return
         
         while True:
             book_id = input("请输入小说ID (输入q退出)：").strip()
@@ -1093,7 +790,7 @@ def main():
                 
             save_path = input("保存路径 (留空为当前目录)：").strip() or os.getcwd()
             
-            file_format = input("请选择下载格式 (1:txt, 2:epub, 3:指定章节范围)：").strip()
+            file_format = input("请选择下载操作 (1:txt, 2:epub, 3:指定章节范围)：").strip()
             start_chapter = None
             end_chapter = None
             
@@ -1102,13 +799,22 @@ def main():
             elif file_format == '2':
                 file_format = 'epub'
             elif file_format == '3':
-                file_format = 'txt'
                 headers = get_headers()
                 chapters = get_chapters_from_api(book_id, headers)
                 if chapters:
                     start_chapter, end_chapter = get_chapter_range_selection(chapters)
                     if start_chapter is None or end_chapter is None:
                         print("取消指定章节范围，将下载全部章节")
+                    else:
+                        # 完成范围选择后询问
+                        fmt_choice = input("请选择下载格式 (1:txt, 2:epub)：").strip()
+                        if fmt_choice == '1':
+                            file_format = 'txt'
+                        elif fmt_choice == '2':
+                            file_format = 'epub'
+                        else:
+                            print("无效选择，已默认使用txt格式")
+                            file_format = 'txt'
                 else:
                     print("无法获取章节列表，将下载全部章节")
             else:
