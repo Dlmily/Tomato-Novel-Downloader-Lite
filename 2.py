@@ -29,7 +29,7 @@ CONFIG = {
     "status_file": "chapter.json",
     "official_api": {
         "enabled": False,
-        "batch_endpoint": "http://0.0.0.0/content",
+        "batch_endpoint": "http://0.0.0.0:8080/content",
         "max_batch_size": 30,
         "timeout": 30
     }
@@ -48,10 +48,6 @@ def start_official_api():
     
     if not os.path.exists("api.py"):
         print("错误: 未找到api.py文件")
-        return False
-    
-    # 安装依赖
-    if not install_dependencies():
         return False
     
     # 启动API服务
@@ -413,21 +409,6 @@ def save_status(save_path, downloaded):
     status_file = os.path.join(save_path, CONFIG["status_file"])
     with open(status_file, 'w', encoding='utf-8') as f:
         json.dump(list(downloaded), f, ensure_ascii=False, indent=2)
-
-def install_dependencies():
-    """安装必要的依赖"""
-    try:
-        import aiohttp
-        import yaml
-    except ImportError:
-        print("正在安装必要的依赖...")
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "aiohttp", "pyyaml", "unzip"])
-            print("依赖安装成功")
-        except subprocess.CalledProcessError:
-            print("依赖安装失败，请手动安装: pip install aiohttp pyyaml unzip")
-            return False
-    return True
 
 def get_chapter_range_selection(chapters):
     """获取章节范围"""
