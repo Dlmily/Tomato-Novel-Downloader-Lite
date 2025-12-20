@@ -1,13 +1,9 @@
 requests
 beautifulsoup4
-lxml
+urllib3
 tqdm
 fake-useragent
-pycryptodome
-stem
-urllib3
-lxml
 ebooklib
-unzip
-pyyaml
 aiohttp
+pyyaml
+pycryptodome
