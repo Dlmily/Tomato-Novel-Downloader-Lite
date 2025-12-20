@@ -245,7 +245,11 @@ cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
 ```
 就可以添加一行行距了
 
-9.`Tor网络怎么使用`
+9.`我该从哪里下载预发布版本的文件？`
+
+[点击此处跳转](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases)
+
+10.`Tor网络怎么使用`
 
 > 适用于旧版本
 
@@ -262,8 +266,8 @@ cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
   (运行2.py脚本前需要关闭系统代理，再使用tor网络下载。注意端口为9050！)
   ![](https://github.com/user-attachments/assets/fb6f1880-09b1-46db-94ce-d3b666bb04ef)
   
-### **1. Windows系统使用Tor网络**
-#### **方法一：使用Tor浏览器（推荐）**
+**1. Windows系统使用Tor网络**
+ **方法一：使用Tor浏览器（推荐）**
 1. **下载并安装Tor浏览器**  
    - 访问 [Tor官网](https://www.torproject.org/) 下载Tor浏览器（自带Tor代理功能）。
 2. **运行Tor浏览器**  
@@ -278,21 +282,21 @@ cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
      ```
      （Tor浏览器默认使用端口9150）。
 
-#### **方法二：使用Tor Expert Bundle（高级用户）**
+ **方法二：使用Tor Expert Bundle（高级用户）**
 - 适用于需要Tor命令行工具的场景：
   - 下载Tor Expert Bundle（无浏览器）。
   - 编辑`torrc`文件配置SOCKS代理（如`SocksPort 9050`）。
 
 ---
 
-### **2. macOS系统使用Tor网络**
-#### **方法一：使用Tor浏览器**
+**2. macOS系统使用Tor网络**
+ **方法一：使用Tor浏览器**
 1. **下载Tor浏览器**  
    - 从Tor官网获取macOS版本并安装。
 2. **连接Tor网络**  
    - 启动后自动连接，支持.onion网站访问。
 
-#### **方法二：命令行安装Tor**
+ **方法二：命令行安装Tor**
 1. **通过Homebrew安装**  
    ```bash
    brew install tor
@@ -305,11 +309,11 @@ cleaned_content = "\n\n".join(p.strip() for p in paragraphs if p.strip())
 
 ---
 
-### **3. Linux（Unix-like）系统使用Tor网络**
-#### **方法一：使用Tor浏览器**
+**3. Linux（Unix-like）系统使用Tor网络**
+ **方法一：使用Tor浏览器**
 - 与Windows/macOS类似，下载对应版本运行即可。
 
-#### **方法二：通过包管理器安装Tor**
+ **方法二：通过包管理器安装Tor**
 1. **Debian/Ubuntu**  
    ```bash
    sudo apt-get install tor torsocks
