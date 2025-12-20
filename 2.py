@@ -29,19 +29,30 @@ CONFIG = {
     "status_file": "chapter.json",
     "official_api": {
         "enabled": False,
-        "batch_endpoint": "http://0.0.0.0:8080/content",
+        "batch_endpoint": "http://127.0.0.1:8080/content",
         "max_batch_size": 30,
-        "timeout": 30
+            "timeout": 30,
+            "batch_wait": 1.2
     }
 }
 
 # 全局变量
 official_api_process = None  # 存储API进程对象
 print_lock = threading.Lock()  # 线程锁
+printed_errors = set()
+
+def print_once(msg: str):
+    """报错优化"""
+    with print_lock:
+        if msg in printed_errors:
+            return
+        printed_errors.add(msg)
+        print(msg)
 
 def start_official_api():
     """启动官方API服务"""
-    
+    global official_api_process
+
     if check_port_open(8080):
         print("官方API服务已在运行")
         return True
@@ -52,23 +63,23 @@ def start_official_api():
     
     # 启动API服务
     try:
-        # 使用subprocess启动api.py
-        api_process = subprocess.Popen([sys.executable, "api.py"], 
-                                      stdout=subprocess.PIPE, 
-                                      stderr=subprocess.PIPE)
-        
+        # 使用subprocess启动api.py，并保存全局进程对象
+        official_api_process = subprocess.Popen([sys.executable, "api.py"],
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.PIPE)
+
         # 等待API服务启动
         time.sleep(5)
-        
+
         # 检查端口是否开放
         if check_port_open(8080):
             print("官方API服务启动成功")
             return True
         else:
-            print("官方API服务启动失败")
+            print_once("官方API服务启动失败")
             return False
     except Exception as e:
-        print(f"启动官方API服务时出错: {e}")
+        print_once(f"启动官方API服务时出错: {e}")
         return False
 
 def stop_web_service():
@@ -123,8 +134,7 @@ def make_request(url, headers=None, params=None, data=None, method='GET', verify
         
         return response
     except Exception as e:
-        with print_lock:
-            print(f"请求失败: {str(e)}")
+        print_once(f"请求失败: {str(e)}")
         raise
 
 def get_headers() -> Dict[str, str]:
@@ -176,7 +186,9 @@ def extract_chapters(soup):
 
 def batch_download_chapters_official(item_ids, headers):
     """官方API批量下载章节内容"""
-    url = CONFIG["official_api"]["batch_endpoint"]
+    # 优先使用配置中的 endpoint，失败时尝试 0.0.0.0
+    primary_url = CONFIG["official_api"]["batch_endpoint"]
+    fallback_url = "http://0.0.0.0:8080/content"
     max_batch_size = CONFIG["official_api"]["max_batch_size"]
     results = {}
     
@@ -184,30 +196,54 @@ def batch_download_chapters_official(item_ids, headers):
     for i in range(0, len(item_ids), max_batch_size):
         batch_ids = item_ids[i:i + max_batch_size]
         params = {'item_ids': ','.join(batch_ids)}
-        try:
-            response = make_request(
-                url,
-                headers=headers,
-                params=params,
-                timeout=CONFIG["official_api"]["timeout"],
-                verify=False
-            )
 
-            if response.status_code == 200:
+        # 先尝试使用 primary_url，如果失败则尝试 fallback_url 并更新配置
+        tried_urls = [primary_url, fallback_url]
+        response = None
+        used_url = None
+        for u in tried_urls:
+            try:
+                response = make_request(
+                    u,
+                    headers=headers,
+                    params=params,
+                    timeout=CONFIG["official_api"]["timeout"],
+                    verify=False
+                )
+                used_url = u
+                break
+            except Exception as e:
+                print_once(f"官方API批量请求异常（{u}）: {str(e)}")
+
+        if response is None:
+            print_once("官方API批量下载失败")
+            continue
+
+        if response.status_code == 200:
+            try:
                 data = response.json()
-                # 官方API返回的是字典，键是章节id，值是包含title和content的对象
-                for chapter_id in batch_ids:
-                    if chapter_id in data:
-                        results[chapter_id] = data[chapter_id]
-                    else:
-                        print(f"警告: 章节 {chapter_id} 不在批量响应中")
-            else:
-                with print_lock:
-                    print(f"官方API批量下载失败，状态码: {response.status_code}")
-                    print(f"响应内容: {response.text[:200]}...")
-        except Exception as e:
-            with print_lock:
-                print(f"官方API批量下载异常: {str(e)}")
+            except Exception as e:
+                print_once(f"解析官方API响应 JSON 失败（{used_url}）: {e}")
+                continue
+
+            # 如果使用了 fallback，更新配置以便后续使用
+            if used_url == fallback_url and CONFIG["official_api"]["batch_endpoint"] != fallback_url:
+                CONFIG["official_api"]["batch_endpoint"] = fallback_url
+                print_once(f"已切换官方API endpoint 到 {fallback_url}")
+
+            # 官方API返回的是字典，键是章节id，值是包含title和content的对象
+            for chapter_id in batch_ids:
+                if chapter_id in data:
+                    results[chapter_id] = data[chapter_id]
+                else:
+                    print_once(f"章节 {chapter_id} 不在批量下载中！")
+        else:
+            print_once(f"官方API批量下载失败，状态码: {response.status_code}")
+            try:
+                txt = response.text
+                print_once(f"响应内容片段: {txt[:300]}...")
+            except Exception:
+                pass
     
     return results
 
@@ -580,8 +616,13 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
                             with lock:
                                 failed_chapters.append(chap)
                         pbar.update(1)
+                    # 每批处理完成后给时间缓冲
+                    try:
+                        time.sleep(CONFIG["official_api"].get("batch_wait", 1.2))
+                    except Exception:
+                        pass
 
-            # 无限静默重试直到全部成功 <- 因一些很神秘的bug只能这么做
+            # 无限静默重试直到全部成功
             retry = 0
             while failed_chapters:
                 retry += 1
@@ -696,17 +737,34 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
                 if todo_chapters:
                     time.sleep(1)
 
-        print(f"下载完成！成功下载 {success_count} 个章节")
+        print(f"下载完成！成功下载 {success_count} 个章节", flush=True)
+        # 下载完成后再次调用 write_downloaded_chapters_in_order
+        try:
+            write_downloaded_chapters_in_order()
+        except Exception as e:
+            print_once(f"合并写入已下载章节失败: {e}")
+        try:
+            save_status(save_path, downloaded)
+        except Exception as e:
+            print_once(f"保存下载状态失败: {e}")
+
+        return
 
     except Exception as e:
         print(f"运行错误: {str(e)}")
         if 'downloaded' in locals():
-            write_downloaded_chapters_in_order()
-            save_status(save_path, downloaded)
+            try:
+                write_downloaded_chapters_in_order()
+            except Exception:
+                pass
+            try:
+                save_status(save_path, downloaded)
+            except Exception:
+                pass
         stop_web_service()
     finally:
-        if CONFIG["official_api"]["enabled"]:
-            stop_web_service()
+        # 由 atexit 在进程退出时统一清理
+        pass
 
 def get_chapter_range_selection(chapters):
     """获取章节范围"""
@@ -741,7 +799,7 @@ def main():
     try:
         print("""欢迎使用番茄小说下载器精简版！
   开发者：Dlmily
-  当前版本：v1.9
+  当前版本：v1.9.1
   Github：https://github.com/Dlmily/Tomato-Novel-Downloader-Lite
   赞助/了解新产品：https://afdian.com/a/dlbaokanluntanos
   *使用前须知*：
@@ -799,7 +857,7 @@ def main():
                 else:
                     print("无法获取章节列表，将下载全部章节")
             else:
-                print("无效的格式选择，将默认使用txt格式")
+                print("无效的选择，将默认使用txt格式")
                 file_format = 'txt'
             
             try:
