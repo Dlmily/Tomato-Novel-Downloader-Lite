@@ -227,7 +227,7 @@ CFLAGS="-O0" pip install lxml
 
 5.`怎么启用官方api？`
 
-由于服务器原因限制，不得不将其独立为一个文件进行使用。如果您想要使用官方api，请在 Releases 页面中下载 2.py 或其他可执行文件时接着下载 api.py，并让它与 2.py 或其他可执行文件处在同一个目录中，接着运行 2.py 或其他可执行文件即可使用官方api
+由于服务器原因限制，不得不将其独立为一个文件进行使用。如果您想要使用官方api，请在 [Releases](https://github.com/Dlmily/Tomato-Novel-Downloader-Lite/releases) 页面中下载最新版本的 api.py，并让它与 2.py 或其他可执行文件处在同一个目录中，接着运行 2.py 或其他可执行文件即可使用官方api
 
 6.`我无法正常运行代码，有没有可执行文件代替？`
 
