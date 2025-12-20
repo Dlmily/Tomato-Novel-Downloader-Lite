@@ -49,7 +49,7 @@ pkg install libxml2 libxslt
 ```
 
 ```
-pip install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib aiohttp pyyaml unzip
+pip install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
 ```
 
 **注：在运行安装命令的时候，您可能会遇到“Do you want to continue? \[Y/n\]”这种情况，这时请输入大写的“Y”并回车来继续下载。**
@@ -66,7 +66,7 @@ python 2.py
 <details>
 <summary>电脑端(点击展开查看)</summary>
 
-### Windows系统
+**Windows系统**
 
 1. **安装Python**
 
@@ -85,7 +85,7 @@ python 2.py
    - 输入以下命令安装所需库：
 
      ```bash
-     pip install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib unzip pyyaml aiohttp
+     pip install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
      ```
 
 4. **运行程序**
@@ -102,7 +102,9 @@ python 2.py
      python 2.py
      ```
 
-### macOS系统
+---
+
+**macOS系统**
 
 1. **安装Python**
 
@@ -125,7 +127,7 @@ python 2.py
    - 输入以下命令：
 
      ```bash
-     pip3 install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib unzip aiohttp pyyaml
+     pip3 install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
      ```
 
 4. **运行程序**
@@ -142,7 +144,9 @@ python 2.py
      python3 2.py
      ```
 
-### Linux系统
+---
+
+**Linux系统**
 
 1. **安装Python**
 
@@ -170,7 +174,7 @@ python 2.py
    - 输入以下命令：
 
      ```bash
-     pip3 install requests beautifulsoup4 urllib3 stem tqdm fake-useragent pycryptodome lxml ebooklib unzip pyyaml aiohttp
+     pip3 install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
      ```
 
 4. **运行程序**
@@ -197,6 +201,8 @@ python 2.py
 本程序的初衷就是极致简化番茄小说下载器的代码，使程序更加易于操作与运行、更加稳定和快速，并且全平台通用，文档对小白十分友好！
 
 2.`为什么我在安装lxml库的时候始终安装不了？`
+
+> 适用于旧版本
 
 按照以下步骤解决：
 ```bash
