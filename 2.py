@@ -787,7 +787,7 @@ def main():
     try:
         print("""欢迎使用番茄小说下载器精简版！
   开发者：Dlmily
-  当前版本：v1.9.1
+  当前版本：v1.9.2
   Github：https://github.com/Dlmily/Tomato-Novel-Downloader-Lite
   赞助/了解新产品：https://afdian.com/a/dlbaokanluntanos
   *使用前须知*：
@@ -803,13 +803,12 @@ def main():
                 CONFIG["official_api"]["enabled"] = True
                 print("官方API已启用")
             else:
-                # 启用失败时切换到 0.0.0.0 并重试
                 fallback = "http://0.0.0.0:8080/content"
                 CONFIG["official_api"]["batch_endpoint"] = fallback
-                print_once(f"启用官方API失败，已切换 endpoint 至 {fallback}，正在重试...")
+                print_once(f"启用官方API失败，已切换 {fallback}，正在重试...")
                 if start_official_api():
                     CONFIG["official_api"]["enabled"] = True
-                    print("官方API已启用（使用 0.0.0.0）")
+                    print("官方API已启用")
                 else:
                     print("官方API启用失败，请检查 api.py 或环境后重试")
                     return
