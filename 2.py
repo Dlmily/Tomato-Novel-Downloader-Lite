@@ -52,36 +52,35 @@ def print_once(msg: str):
 def start_official_api():
     """启动官方API服务"""
     global official_api_process
+
     if check_port_open(8080):
         print("官方API服务已在运行")
         return True
-
-    fallback_url = "http://0.0.0.0:8080/content"
-
+    
     if not os.path.exists("api.py"):
         print("错误: 未找到api.py文件")
         return False
-
-    # subprocess启动api.py
+    
+    # 启动API服务
     try:
+        # 使用subprocess启动api.py
         official_api_process = subprocess.Popen([sys.executable, "api.py"],
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE)
 
-        # 等待 API 服务启动
-        time.sleep(10)
+        # 等待API服务启动
+        time.sleep(5)
 
         # 检查端口是否开放
         if check_port_open(8080):
             print("官方API服务启动成功")
             return True
         else:
-            print_once("官方API服务启动失败，已切换到 0.0.0.0")
-            CONFIG["official_api"]["batch_endpoint"] = fallback_url
-            return True
+            print_once("官方API服务启动失败")
+            return False
     except Exception as e:
         print_once(f"启动官方API服务时出错: {e}")
-        return
+        return False
 
 def stop_web_service():
     """停止Web服务"""
@@ -187,19 +186,16 @@ def extract_chapters(soup):
 
 def batch_download_chapters_official(item_ids, headers):
     """官方API批量下载章节内容"""
+    endpoint = CONFIG["official_api"]["batch_endpoint"]
     max_batch_size = CONFIG["official_api"]["max_batch_size"]
     results = {}
-
-    endpoint = CONFIG["official_api"].get("batch_endpoint")
-    if not endpoint:
-        print_once("未配置官方API endpoint，批量下载失败")
-        return results
 
     # 分批处理
     for i in range(0, len(item_ids), max_batch_size):
         batch_ids = item_ids[i:i + max_batch_size]
         params = {'item_ids': ','.join(batch_ids)}
 
+        response = None
         try:
             response = make_request(
                 endpoint,
@@ -791,7 +787,7 @@ def main():
     try:
         print("""欢迎使用番茄小说下载器精简版！
   开发者：Dlmily
-  当前版本：v1.9.2
+  当前版本：v1.9.1
   Github：https://github.com/Dlmily/Tomato-Novel-Downloader-Lite
   赞助/了解新产品：https://afdian.com/a/dlbaokanluntanos
   *使用前须知*：
@@ -807,8 +803,16 @@ def main():
                 CONFIG["official_api"]["enabled"] = True
                 print("官方API已启用")
             else:
-                print("官方API启用失败，请检查 api.py 或环境后重试")
-                return
+                # 启用失败时切换到 0.0.0.0 并重试
+                fallback = "http://0.0.0.0:8080/content"
+                CONFIG["official_api"]["batch_endpoint"] = fallback
+                print_once(f"启用官方API失败，已切换 endpoint 至 {fallback}，正在重试...")
+                if start_official_api():
+                    CONFIG["official_api"]["enabled"] = True
+                    print("官方API已启用（使用 0.0.0.0）")
+                else:
+                    print("官方API启用失败，请检查 api.py 或环境后重试")
+                    return
         else:
             print("当前程序仅支持官方API，目前暂时放弃对第三方API的使用。程序退出。")
             return
