@@ -52,35 +52,36 @@ def print_once(msg: str):
 def start_official_api():
     """启动官方API服务"""
     global official_api_process
-
     if check_port_open(8080):
         print("官方API服务已在运行")
         return True
-    
+
+    fallback_url = "http://0.0.0.0:8080/content"
+
     if not os.path.exists("api.py"):
         print("错误: 未找到api.py文件")
         return False
-    
-    # 启动API服务
+
+    # subprocess启动api.py
     try:
-        # 使用subprocess启动api.py，并保存全局进程对象
         official_api_process = subprocess.Popen([sys.executable, "api.py"],
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE)
 
-        # 等待API服务启动
-        time.sleep(5)
+        # 等待 API 服务启动
+        time.sleep(10)
 
         # 检查端口是否开放
         if check_port_open(8080):
             print("官方API服务启动成功")
             return True
         else:
-            print_once("官方API服务启动失败")
-            return False
+            print_once("官方API服务启动失败，已切换到 0.0.0.0")
+            CONFIG["official_api"]["batch_endpoint"] = fallback_url
+            return True
     except Exception as e:
         print_once(f"启动官方API服务时出错: {e}")
-        return False
+        return
 
 def stop_web_service():
     """停止Web服务"""
@@ -186,34 +187,30 @@ def extract_chapters(soup):
 
 def batch_download_chapters_official(item_ids, headers):
     """官方API批量下载章节内容"""
-    # 优先使用配置中的 endpoint，失败时尝试 0.0.0.0
-    primary_url = CONFIG["official_api"]["batch_endpoint"]
-    fallback_url = "http://0.0.0.0:8080/content"
     max_batch_size = CONFIG["official_api"]["max_batch_size"]
     results = {}
-    
+
+    endpoint = CONFIG["official_api"].get("batch_endpoint")
+    if not endpoint:
+        print_once("未配置官方API endpoint，批量下载失败")
+        return results
+
     # 分批处理
     for i in range(0, len(item_ids), max_batch_size):
         batch_ids = item_ids[i:i + max_batch_size]
         params = {'item_ids': ','.join(batch_ids)}
 
-        # 先尝试使用 primary_url，如果失败则尝试 fallback_url 并更新配置
-        tried_urls = [primary_url, fallback_url]
-        response = None
-        used_url = None
-        for u in tried_urls:
-            try:
-                response = make_request(
-                    u,
-                    headers=headers,
-                    params=params,
-                    timeout=CONFIG["official_api"]["timeout"],
-                    verify=False
-                )
-                used_url = u
-                break
-            except Exception as e:
-                print_once(f"官方API批量请求异常（{u}）: {str(e)}")
+        try:
+            response = make_request(
+                endpoint,
+                headers=headers,
+                params=params,
+                timeout=CONFIG["official_api"]["timeout"],
+                verify=False
+            )
+        except Exception as e:
+            print_once(f"官方API批量请求异常（{endpoint}）: {str(e)}")
+            continue
 
         if response is None:
             print_once("官方API批量下载失败")
@@ -223,13 +220,8 @@ def batch_download_chapters_official(item_ids, headers):
             try:
                 data = response.json()
             except Exception as e:
-                print_once(f"解析官方API响应 JSON 失败（{used_url}）: {e}")
+                print_once(f"解析官方API响应 JSON 失败（{endpoint}）: {e}")
                 continue
-
-            # 如果使用了 fallback，更新配置以便后续使用
-            if used_url == fallback_url and CONFIG["official_api"]["batch_endpoint"] != fallback_url:
-                CONFIG["official_api"]["batch_endpoint"] = fallback_url
-                print_once(f"已切换官方API endpoint 到 {fallback_url}")
 
             # 官方API返回的是字典，键是章节id，值是包含title和content的对象
             for chapter_id in batch_ids:
@@ -244,7 +236,7 @@ def batch_download_chapters_official(item_ids, headers):
                 print_once(f"响应内容片段: {txt[:300]}...")
             except Exception:
                 pass
-    
+
     return results
 
 def process_chapter_content(content):
@@ -799,7 +791,7 @@ def main():
     try:
         print("""欢迎使用番茄小说下载器精简版！
   开发者：Dlmily
-  当前版本：v1.9.1
+  当前版本：v1.9.2
   Github：https://github.com/Dlmily/Tomato-Novel-Downloader-Lite
   赞助/了解新产品：https://afdian.com/a/dlbaokanluntanos
   *使用前须知*：
