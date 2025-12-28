@@ -37,9 +37,9 @@ CONFIG = {
 }
 
 # 全局变量
-official_api_process = None  # 存储API进程对象
+official_api_process = None  # 存储API进程
 print_lock = threading.Lock()  # 线程锁
-printed_errors = set()
+printed_errors = set()  # 打印的错误信息
 
 def print_once(msg: str):
     """报错优化"""
@@ -156,34 +156,6 @@ def get_headers() -> Dict[str, str]:
         "Content-Type": "application/json"
     }
 
-def extract_chapters(soup):
-    """解析章节列表"""
-    chapters = []
-    for idx, item in enumerate(soup.select('div.chapter-item')):
-        a_tag = item.find('a')
-        if not a_tag:
-            continue
-        
-        raw_title = a_tag.get_text(strip=True)
-        
-        if re.match(r'^(番外|特别篇|if线)\s*', raw_title):
-            final_title = raw_title
-        else:
-            clean_title = re.sub(
-                r'^第[一二三四五六七八九十百千\d]+章\s*',
-                '', 
-                raw_title
-            ).strip()
-            final_title = f"第{idx+1}章 {clean_title}"
-        
-        chapters.append({
-            "id": a_tag['href'].split('/')[-1],
-            "title": final_title,
-            "url": f"https://fanqienovel.com{a_tag['href']}",
-            "index": idx
-        })
-    return chapters
-
 def batch_download_chapters_official(item_ids, headers):
     """官方API批量下载章节内容"""
     endpoint = CONFIG["official_api"]["batch_endpoint"]
@@ -270,52 +242,34 @@ def process_chapter_content(content):
             print(f"内容处理错误: {str(e)}")
         return str(content)
 
-def down_text(chapter_id, headers, book_id=None):
-    """下载单个章节内容"""
-    if CONFIG["official_api"]["enabled"]:
-        batch_data = batch_download_chapters_official([chapter_id], headers)
-        if batch_data and chapter_id in batch_data:
-            content = batch_data[chapter_id].get("content", "")
-            title = batch_data[chapter_id].get("title", "")
-            if content:
-                processed_content = process_chapter_content(content)
-                processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                return title, processed
-
-    with print_lock:
-        print(f"未启用官方 API 或官方 API 获取失败。章节 {chapter_id} 获取失败。")
-    return None, None
-
 def get_chapters_from_api(book_id, headers):
-    """从API获取章节列表"""
+    """从API获取章节id/title"""
     try:
-        page_url = f'https://fanqienovel.com/page/{book_id}'
-        response = requests.get(page_url, headers=headers, timeout=CONFIG["request_timeout"])
-        soup = bs4.BeautifulSoup(response.text, 'html.parser')
-        chapters = extract_chapters(soup)  
-        
         api_url = f"https://fanqienovel.com/api/reader/directory/detail?bookId={book_id}"
         api_response = requests.get(api_url, headers=headers, timeout=CONFIG["request_timeout"])
         api_data = api_response.json()
         chapter_ids = api_data.get("data", {}).get("allItemIds", [])
-        
+
+        api_titles = {}
+        if chapter_ids:
+            try:
+                api_titles = batch_download_chapters_official(chapter_ids, headers)
+            except Exception:
+                api_titles = {}
+
         final_chapters = []
         for idx, chapter_id in enumerate(chapter_ids):
-            web_chapter = next((ch for ch in chapters if ch["id"] == chapter_id), None)
-            
-            if web_chapter:
-                final_chapters.append({
-                    "id": chapter_id,
-                    "title": web_chapter["title"],
-                    "index": idx
-                })
-            else:
-                final_chapters.append({
-                    "id": chapter_id,
-                    "title": f"第{idx+1}章",
-                    "index": idx
-                })
-        
+            title = ""
+            if chapter_id in api_titles and isinstance(api_titles[chapter_id], dict):
+                title = api_titles[chapter_id].get("title", "")
+            if not title:
+                title = f"第{idx+1}章"
+            final_chapters.append({
+                "id": chapter_id,
+                "title": title,
+                "index": idx
+            })
+
         return final_chapters
     except Exception as e:
         with print_lock:
@@ -354,30 +308,6 @@ def create_epub_book(name, author_name, description, chapter_results, chapters):
     book.spine = spine
     
     return book
-
-def download_chapter(chapter, headers, save_path, book_name, downloaded, book_id, file_format='txt'):
-    """下载单个章节"""
-    if chapter["id"] in downloaded:
-        return None
-    
-    title, content = down_text(chapter["id"], headers, book_id)
-    
-    if content:
-        if file_format == 'txt':
-            output_file_path = os.path.join(save_path, f"{book_name}.txt")
-            try:
-                with open(output_file_path, 'a', encoding='utf-8') as f:
-                    f.write(f'{chapter["title"]}\n')
-                    f.write(content + '\n\n')
-                
-                downloaded.add(chapter["id"])
-                save_status(save_path, downloaded)
-                return chapter["index"], content
-            except Exception as e:
-                with print_lock:
-                    print(f"写入文件失败: {str(e)}")
-        return chapter["index"], content
-    return None
 
 def get_book_info(book_id, headers):
     """获取书名、作者、简介"""
@@ -467,7 +397,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
         print("\n检测到程序中断，正在保存已下载内容...")
         write_downloaded_chapters_in_order()
         save_status(save_path, downloaded)
-        print(f"已保存 {len(downloaded)} 个章节的进度")
+        print(f"已保存下载的章节进度")
         stop_web_service()
         sys.exit(0)
     
@@ -514,7 +444,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
         downloaded = load_status(save_path)
         if downloaded and (start_chapter is None and end_chapter is None):
             print(f"检测到您曾经下载过小说《{name}》。")
-            if input("是否需要再次下载？(y/n)：") != "y":
+            if input("是否需要继续下载？(y/n)：") != "y":
                 print("已取消下载")
                 return
 
@@ -536,6 +466,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
         chapter_results = {}
         lock = threading.Lock()
         print_lock = threading.Lock()
+        all_futures = []
 
         # 官方api批量下载
         if CONFIG["official_api"]["enabled"]:
@@ -564,6 +495,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
                             chunk_ids = item_ids[j:j + chunk_size]
                             future = executor.submit(process_batch_chunk, chunk_ids)
                             chunk_futures.append((future, chunk_ids))
+                            all_futures.append(future)
                         
                         for future, chunk_ids in chunk_futures:
                             try:
@@ -612,7 +544,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
 
             # 无限静默重试直到全部成功
             retry = 0
-            while failed_chapters:
+            for failed_chapters in [failed_chapters]:
                 retry += 1
                 retry_ids = [c["id"] for c in failed_chapters]
                 new_failed = []
@@ -631,6 +563,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
                             chunk_ids = batch_ids[k:k + chunk_size]
                             future = executor.submit(retry_batch_chunk, chunk_ids)
                             chunk_futures.append((future, chunk_ids))
+                            all_futures.append(future)
                         
                         for future, chunk_ids in chunk_futures:
                             try:
@@ -673,69 +606,14 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
                                 new_failed.append(chap_obj)
 
                 failed_chapters = new_failed
+                break
 
             todo_chapters = failed_chapters.copy()
             failed_chapters = []
             write_downloaded_chapters_in_order()
             save_status(save_path, downloaded)
 
-        # 单章补充下载
-        if todo_chapters:
-            print(f"开始单章下载模式，剩余 {len(todo_chapters)} 个章节...")
-
-            def download_task(chapter):
-                nonlocal success_count
-                try:
-                    fresh_headers = get_headers()
-                    title, content = down_text(chapter["id"], fresh_headers, book_id)
-                    if content:
-                        with lock:
-                            chapter_results[chapter["index"]] = {
-                                "base_title": chapter["title"],
-                                "api_title": title,
-                                "content": content
-                            }
-                            downloaded.add(chapter["id"])
-                            success_count += 1
-                    else:
-                        with lock:
-                            failed_chapters.append(chapter)
-                except Exception:
-                    with print_lock:
-                        print(f"章节 {chapter['id']} 下载失败！")
-                    with lock:
-                        failed_chapters.append(chapter)
-
-            attempt = 1
-            while todo_chapters:
-                print(f"\n第 {attempt} 次尝试，剩余 {len(todo_chapters)} 个章节...")
-                attempt += 1
-
-                with ThreadPoolExecutor(max_workers=CONFIG["max_workers"]) as executor:
-                    futures = [executor.submit(download_task, ch) for ch in todo_chapters]
-                    with tqdm(total=len(todo_chapters), desc="单章下载进度") as pbar:
-                        for _ in as_completed(futures):
-                            pbar.update(1)
-
-                write_downloaded_chapters_in_order()
-                save_status(save_path, downloaded)
-                todo_chapters = failed_chapters.copy()
-                failed_chapters = []
-
-                if todo_chapters:
-                    time.sleep(1)
-
-        print(f"下载完成！成功下载 {success_count} 个章节", flush=True)
-        # 下载完成后再次调用 write_downloaded_chapters_in_order
-        try:
-            write_downloaded_chapters_in_order()
-        except Exception as e:
-            print_once(f"合并写入已下载章节失败: {e}")
-        try:
-            save_status(save_path, downloaded)
-        except Exception as e:
-            print_once(f"保存下载状态失败: {e}")
-
+        print(f"下载完成！成功下载《{name}》", flush=True)
         return
 
     except Exception as e:
