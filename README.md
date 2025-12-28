@@ -10,7 +10,7 @@ api开发者和本程序的权益，1.7正式版之后的版本将进入“半�
 >
 >4.项目开发者有时会玩失踪。失踪并不意味着跑路，如果真的跑路了会将此存储库存档的！
 
-如你所见，这个程序只有不到35kb的python文件，但这不影响它的功能！这个程序简单易操作，可以满足你的小说下载需求，需要运行此程序的话，最好是在终端中，以下的所有需要输入的内容都需要在终端中进行，并且在使用此程序之前，您必须先安装python！
+如你所见，这个程序只有不到30kb的python文件，但这不影响它的功能！这个程序简单易操作，可以满足你的小说下载需求，需要运行此程序的话，最好是在终端中，以下的所有需要输入的内容都需要在终端中进行，并且在使用此程序之前，您必须先安装python！
 ## 我该如何使用？
 <details>
 <summary>手机端(点击展开查看)</summary>
@@ -49,7 +49,7 @@ pkg install libxml2 libxslt
 ```
 
 ```
-pip install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
+pip install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml pycryptodome
 ```
 
 **注：在运行安装命令的时候，您可能会遇到“Do you want to continue? \[Y/n\]”这种情况，这时请输入大写的“Y”并回车来继续下载。**
@@ -85,7 +85,7 @@ python 2.py
    - 输入以下命令安装所需库：
 
      ```bash
-     pip install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
+     pip install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml pycryptodome
      ```
 
 4. **运行程序**
@@ -127,7 +127,7 @@ python 2.py
    - 输入以下命令：
 
      ```bash
-     pip3 install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
+     pip3 install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml pycryptodome
      ```
 
 4. **运行程序**
@@ -174,7 +174,7 @@ python 2.py
    - 输入以下命令：
 
      ```bash
-     pip3 install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml
+     pip3 install requests beautifulsoup4 urllib3 tqdm fake-useragent EbookLib aiohttp pyyaml pycryptodome
      ```
 
 4. **运行程序**
