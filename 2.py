@@ -477,144 +477,99 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
             dynamic_batch_size = batch_size * CONFIG["max_workers"]
 
             with tqdm(total=len(todo_chapters), desc="批量下载进度") as pbar:
-                for i in range(0, len(todo_chapters), dynamic_batch_size):
-                    batch = todo_chapters[i:i + dynamic_batch_size]
-                    item_ids = [chap["id"] for chap in batch]
-
-                    # 多线程批量下载
-                    def process_batch_chunk(chunk):
-                        return batch_download_chapters_official(chunk, headers)
+                while todo_chapters:
+                    current_batch = todo_chapters[:dynamic_batch_size]
+                    todo_chapters = todo_chapters[dynamic_batch_size:]
                     
-                    # 大批分成小批并行处理
-                    chunk_size = max(1, dynamic_batch_size // CONFIG["max_workers"])
-                    batch_results = {}
+                    item_ids = [chap["id"] for chap in current_batch]
+                    retry_count = 0
                     
-                    with ThreadPoolExecutor(max_workers=CONFIG["max_workers"]) as executor:
-                        chunk_futures = []
-                        for j in range(0, len(item_ids), chunk_size):
-                            chunk_ids = item_ids[j:j + chunk_size]
-                            future = executor.submit(process_batch_chunk, chunk_ids)
-                            chunk_futures.append((future, chunk_ids))
-                            all_futures.append(future)
+                    # 无限重试直到成功
+                    while current_batch:
+                        batch_results = {}
                         
-                        for future, chunk_ids in chunk_futures:
-                            try:
-                                chunk_result = future.result(timeout=CONFIG["official_api"]["timeout"])
-                                if chunk_result:
-                                    batch_results.update(chunk_result)
-                            except Exception as e:
-                                with print_lock:
-                                    print(f"批量下载块处理失败: {str(e)}")
+                        # 多线程批量下载
+                        def process_batch_chunk(chunk):
+                            return batch_download_chapters_official(chunk, headers)
+                        
+                        # 大批分成小批并行处理
+                        chunk_size = max(1, dynamic_batch_size // CONFIG["max_workers"])
+                        
+                        with ThreadPoolExecutor(max_workers=CONFIG["max_workers"]) as executor:
+                            chunk_futures = []
+                            for j in range(0, len(item_ids), chunk_size):
+                                chunk_ids = item_ids[j:j + chunk_size]
+                                future = executor.submit(process_batch_chunk, chunk_ids)
+                                chunk_futures.append((future, chunk_ids))
+                                all_futures.append(future)
+                            
+                            for future, chunk_ids in chunk_futures:
+                                try:
+                                    chunk_result = future.result(timeout=CONFIG["official_api"]["timeout"])
+                                    if chunk_result:
+                                        batch_results.update(chunk_result)
+                                except Exception as e:
+                                    with print_lock:
+                                        print(f"批量下载块处理失败: {str(e)}")
 
-                    if not batch_results:
-                        with print_lock:
-                            print(f"第 {i//dynamic_batch_size + 1} 批下载失败")
-                        failed_chapters.extend(batch)
-                        pbar.update(len(batch))
-                        continue
-
-                    for chap in batch:
-                        entry = batch_results.get(chap["id"])
-                        if entry and isinstance(entry, dict):
-                            content = entry.get("content", "")
-                            title = entry.get("title", "")
-                            if content:
-                                processed_content = process_chapter_content(content)
-                                processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                                with lock:
-                                    chapter_results[chap["index"]] = {
-                                        "base_title": chap["title"],
-                                        "api_title": title,
-                                        "content": processed
-                                    }
-                                    downloaded.add(chap["id"])
-                                    success_count += 1
+                        if not batch_results:
+                            with print_lock:
+                                print(f"批量下载失败，正在重试... (重试次数: {retry_count + 1})")
+                            retry_count += 1
+                            time.sleep(2)
+                            continue
+                        
+                        # 处理成功下载的章节
+                        new_current_batch = []
+                        new_item_ids = []
+                        for chap in current_batch:
+                            entry = batch_results.get(chap["id"])
+                            if entry and isinstance(entry, dict):
+                                content = entry.get("content", "")
+                                title = entry.get("title", "")
+                                if content:
+                                    processed_content = process_chapter_content(content)
+                                    processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
+                                    with lock:
+                                        chapter_results[chap["index"]] = {
+                                            "base_title": chap["title"],
+                                            "api_title": title,
+                                            "content": processed
+                                        }
+                                        downloaded.add(chap["id"])
+                                        success_count += 1
+                                    pbar.update(1)
+                                else:
+                                    new_current_batch.append(chap)
+                                    new_item_ids.append(chap["id"])
                             else:
-                                with lock:
-                                    failed_chapters.append(chap)
+                                new_current_batch.append(chap)
+                                new_item_ids.append(chap["id"])
+                        
+                        # 如果还有失败的章节，继续重试
+                        current_batch = new_current_batch
+                        item_ids = new_item_ids
+                        
+                        if current_batch:
+                            with print_lock:
+                                print(f"本批次有 {len(current_batch)} 个章节下载失败，正在重试...")
+                            retry_count += 1
+                            time.sleep(1.5)
                         else:
-                            with lock:
-                                failed_chapters.append(chap)
-                        pbar.update(1)
+                            # 本批次全部成功，保存进度
+                            write_downloaded_chapters_in_order()
+                            save_status(save_path, downloaded)
+                            break
+                    
                     # 每批处理完成后给时间缓冲
-                    try:
-                        time.sleep(CONFIG["official_api"].get("batch_wait", 1.2))
-                    except Exception:
-                        pass
+                    if todo_chapters:
+                        try:
+                            time.sleep(CONFIG["official_api"].get("batch_wait", 1.2))
+                        except Exception:
+                            pass
 
-            # 无限静默重试直到全部成功
-            retry = 0
-            for failed_chapters in [failed_chapters]:
-                retry += 1
-                retry_ids = [c["id"] for c in failed_chapters]
-                new_failed = []
-
-                for j in range(0, len(retry_ids), dynamic_batch_size):
-                    batch_ids = retry_ids[j:j + dynamic_batch_size]
-                    
-                    # 多线程重试
-                    def retry_batch_chunk(chunk):
-                        return batch_download_chapters_official(chunk, headers)
-                    
-                    batch_results = {}
-                    with ThreadPoolExecutor(max_workers=CONFIG["max_workers"]) as executor:
-                        chunk_futures = []
-                        for k in range(0, len(batch_ids), chunk_size):
-                            chunk_ids = batch_ids[k:k + chunk_size]
-                            future = executor.submit(retry_batch_chunk, chunk_ids)
-                            chunk_futures.append((future, chunk_ids))
-                            all_futures.append(future)
-                        
-                        for future, chunk_ids in chunk_futures:
-                            try:
-                                chunk_result = future.result(timeout=CONFIG["official_api"]["timeout"])
-                                if chunk_result:
-                                    batch_results.update(chunk_result)
-                            except Exception as e:
-                                with print_lock:
-                                    print(f"重试批量下载块处理失败: {str(e)}")
-
-                    if not batch_results:
-                        for bid in batch_ids:
-                            chap_obj = next((c for c in failed_chapters if c["id"] == bid), None)
-                            if chap_obj:
-                                new_failed.append(chap_obj)
-                        continue
-
-                    for bid in batch_ids:
-                        chap_obj = next((c for c in failed_chapters if c["id"] == bid), None)
-                        entry = batch_results.get(bid)
-                        if entry and isinstance(entry, dict):
-                            content = entry.get("content", "")
-                            title = entry.get("title", "")
-                            if content and chap_obj:
-                                processed_content = process_chapter_content(content)
-                                processed = re.sub(r'^(\s*)', r'　　', processed_content, flags=re.MULTILINE)
-                                with lock:
-                                    chapter_results[chap_obj["index"]] = {
-                                        "base_title": chap_obj["title"],
-                                        "api_title": title,
-                                        "content": processed
-                                    }
-                                    downloaded.add(chap_obj["id"])
-                                    success_count += 1
-                            else:
-                                if chap_obj:
-                                    new_failed.append(chap_obj)
-                        else:
-                            if chap_obj:
-                                new_failed.append(chap_obj)
-
-                failed_chapters = new_failed
-                break
-
-            todo_chapters = failed_chapters.copy()
-            failed_chapters = []
-            write_downloaded_chapters_in_order()
-            save_status(save_path, downloaded)
-
-        print(f"下载完成！成功下载《{name}》", flush=True)
-        return
+            print(f"下载完成！成功下载《{name}》", flush=True)
+            return
 
     except Exception as e:
         print(f"运行错误: {str(e)}")
