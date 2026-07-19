@@ -202,8 +202,8 @@ def batch_download_chapters_official(item_ids, headers):
             try:
                 txt = response.text
                 print_once(f"响应内容片段: {txt[:300]}...")
-            except Exception:
-                pass
+            except Exception as e:
+                print_once(f"无法读取响应片段: {e}")
 
     return results
 
@@ -354,8 +354,8 @@ def load_status(save_path):
                 if isinstance(data, list):
                     return set(data)
                 return set()
-        except:
-            pass
+        except (json.JSONDecodeError, OSError):
+            print_once("加载状态文件失败: 文件损坏或无法读取")
     return set()
 
 def save_status(save_path, downloaded):
@@ -566,7 +566,7 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
                         try:
                             time.sleep(CONFIG["official_api"].get("batch_wait", 1.2))
                         except Exception:
-                            pass
+                            print_once("批量等待被中断")
 
             print(f"下载完成！成功下载《{name}》", flush=True)
             return
@@ -576,12 +576,12 @@ def Run(book_id, save_path, file_format='txt', start_chapter=None, end_chapter=N
         if 'downloaded' in locals():
             try:
                 write_downloaded_chapters_in_order()
-            except Exception:
-                pass
+            except Exception as e:
+                print_once(f"保存下载内容时出错: {e}")
             try:
                 save_status(save_path, downloaded)
-            except Exception:
-                pass
+            except Exception as e:
+                print_once(f"保存状态时出错: {e}")
         stop_web_service()
     finally:
         # 由 atexit 在进程退出时统一清理
