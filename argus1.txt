@@ -1,0 +1,1249 @@
+.class public final Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .locals 1
+
+    const v0, 0x81b10
+
+    invoke-static {v0}, Lcom/bytedance/covode/number/Covode;->recordClassIndex(I)V
+
+    return-void
+.end method
+
+.method public static final a(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;)Landroid/webkit/WebResourceResponse;
+    .locals 7
+
+    .prologue
+    .line 17039360
+    const-string v0, "<this>"
+
+    .line 17039361
+    .line 17039362
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 17039363
+    .line 17039364
+    .line 17039365
+    const-string p0, "x-argus"
+
+    .line 17039366
+    .line 17039367
+    const-string v0, "The request was intercepted because it posed a security risk"
+
+    .line 17039368
+    .line 17039369
+    invoke-static {p0, v0}, Lkotlin/TuplesKt;->to(Ljava/lang/Object;Ljava/lang/Object;)Lkotlin/Pair;
+
+    .line 17039370
+    .line 17039371
+    .line 17039372
+    move-result-object p0
+
+    .line 17039373
+    invoke-static {p0}, Lkotlin/collections/MapsKt;->mapOf(Lkotlin/Pair;)Ljava/util/Map;
+
+    .line 17039374
+    .line 17039375
+    .line 17039376
+    move-result-object v5
+
+    .line 17039377
+    new-instance p0, Landroid/webkit/WebResourceResponse;
+
+    .line 17039378
+    .line 17039379
+    const-string v1, "text/plain"
+
+    .line 17039380
+    .line 17039381
+    const-string v2, "UTF-8"
+
+    .line 17039382
+    .line 17039383
+    const/16 v3, 0x193
+
+    .line 17039384
+    .line 17039385
+    const-string v4, "Request forbidden for seucrity reason"
+
+    .line 17039386
+    .line 17039387
+    new-instance v6, Ljava/io/ByteArrayInputStream;
+
+    .line 17039388
+    .line 17039389
+    const/4 v0, 0x0
+
+    .line 17039390
+    new-array v0, v0, [B
+
+    .line 17039391
+    .line 17039392
+    invoke-direct {v6, v0}, Ljava/io/ByteArrayInputStream;-><init>([B)V
+
+    .line 17039393
+    .line 17039394
+    .line 17039395
+    move-object v0, p0
+
+    .line 17039396
+    invoke-direct/range {v0 .. v6}, Landroid/webkit/WebResourceResponse;-><init>(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/Map;Ljava/io/InputStream;)V
+
+    .line 17039397
+    .line 17039398
+    .line 17039399
+    return-object p0
+.end method
+
+.method public static final b(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+    .locals 8
+
+    .prologue
+    .line 17104896
+    const-string v0, "<this>"
+
+    .line 17104897
+    .line 17104898
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 17104899
+    .line 17104900
+    .line 17104901
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 17104902
+    .line 17104903
+    .line 17104904
+    move-result-object p0
+
+    .line 17104905
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/aspect/eventCenter/f;->s()Lkotlin/Pair;
+
+    .line 17104906
+    .line 17104907
+    .line 17104908
+    move-result-object p0
+
+    .line 17104909
+    const/4 v0, 0x3
+
+    .line 17104910
+    const/4 v1, 0x0
+
+    .line 17104911
+    if-eqz p0, :cond_1
+
+    .line 17104912
+    .line 17104913
+    invoke-virtual {p0}, Lkotlin/Pair;->getFirst()Ljava/lang/Object;
+
+    .line 17104914
+    .line 17104915
+    .line 17104916
+    move-result-object p0
+
+    .line 17104917
+    check-cast p0, Lcom/bytedance/webx/seclink/base/ISecLinkStrategy;
+
+    .line 17104918
+    .line 17104919
+    if-eqz p0, :cond_1
+
+    .line 17104920
+    .line 17104921
+    invoke-interface {p0}, Lcom/bytedance/webx/seclink/base/ISecLinkStrategy;->handleGoBack()Z
+
+    .line 17104922
+    .line 17104923
+    .line 17104924
+    move-result p0
+
+    .line 17104925
+    if-eqz p0, :cond_0
+
+    .line 17104926
+    .line 17104927
+    new-instance v2, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104928
+    .line 17104929
+    invoke-direct {v2, v1, v1, v0, v1}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;-><init>(Lcom/bytedance/ies/argus/strategy/a;Lcom/bytedance/ies/argus/bean/a;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    .line 17104930
+    .line 17104931
+    .line 17104932
+    sget-object v3, Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;->BLOCK_BY_SEC_LINK_HANDLE:Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;
+
+    .line 17104933
+    .line 17104934
+    const/4 v4, 0x0
+
+    .line 17104935
+    const/4 v5, 0x0
+
+    .line 17104936
+    const/4 v6, 0x6
+
+    .line 17104937
+    const/4 v7, 0x0
+
+    .line 17104938
+    invoke-static/range {v2 .. v7}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onBlock$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104939
+    .line 17104940
+    .line 17104941
+    move-result-object p0
+
+    .line 17104942
+    goto :goto_0
+
+    .line 17104943
+    :cond_0
+    new-instance p0, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104944
+    .line 17104945
+    invoke-direct {p0, v1, v1, v0, v1}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;-><init>(Lcom/bytedance/ies/argus/strategy/a;Lcom/bytedance/ies/argus/bean/a;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    .line 17104946
+    .line 17104947
+    .line 17104948
+    sget-object v1, Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;->PASS_BY_SEC_LINK_HANDLE:Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;
+
+    .line 17104949
+    .line 17104950
+    const/4 v2, 0x0
+
+    .line 17104951
+    const/4 v3, 0x0
+
+    .line 17104952
+    const/4 v4, 0x6
+
+    .line 17104953
+    const/4 v5, 0x0
+
+    .line 17104954
+    move-object v0, p0
+
+    .line 17104955
+    invoke-static/range {v0 .. v5}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onPass$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104956
+    .line 17104957
+    .line 17104958
+    move-result-object p0
+
+    .line 17104959
+    :goto_0
+    return-object p0
+
+    .line 17104960
+    :cond_1
+    new-instance p0, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104961
+    .line 17104962
+    invoke-direct {p0, v1, v1, v0, v1}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;-><init>(Lcom/bytedance/ies/argus/strategy/a;Lcom/bytedance/ies/argus/bean/a;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    .line 17104963
+    .line 17104964
+    .line 17104965
+    sget-object v1, Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;->SEC_LINK_STRATEGY_IS_NULL:Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;
+
+    .line 17104966
+    .line 17104967
+    const/4 v2, 0x0
+
+    .line 17104968
+    const/4 v3, 0x0
+
+    .line 17104969
+    const/4 v4, 0x6
+
+    .line 17104970
+    const/4 v5, 0x0
+
+    .line 17104971
+    move-object v0, p0
+
+    .line 17104972
+    invoke-static/range {v0 .. v5}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onPass$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104973
+    .line 17104974
+    .line 17104975
+    move-result-object p0
+
+    .line 17104976
+    return-object p0
+.end method
+
+.method public static final c(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+    .locals 8
+
+    .prologue
+    .line 17104896
+    const-string v0, "<this>"
+
+    .line 17104897
+    .line 17104898
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 17104899
+    .line 17104900
+    .line 17104901
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 17104902
+    .line 17104903
+    .line 17104904
+    move-result-object p0
+
+    .line 17104905
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/aspect/eventCenter/f;->s()Lkotlin/Pair;
+
+    .line 17104906
+    .line 17104907
+    .line 17104908
+    move-result-object p0
+
+    .line 17104909
+    const/4 v0, 0x3
+
+    .line 17104910
+    const/4 v1, 0x0
+
+    .line 17104911
+    if-eqz p0, :cond_1
+
+    .line 17104912
+    .line 17104913
+    invoke-virtual {p0}, Lkotlin/Pair;->getFirst()Ljava/lang/Object;
+
+    .line 17104914
+    .line 17104915
+    .line 17104916
+    move-result-object p0
+
+    .line 17104917
+    check-cast p0, Lcom/bytedance/webx/seclink/base/ISecLinkStrategy;
+
+    .line 17104918
+    .line 17104919
+    if-eqz p0, :cond_1
+
+    .line 17104920
+    .line 17104921
+    invoke-interface {p0}, Lcom/bytedance/webx/seclink/base/ISecLinkStrategy;->canGoBack()Z
+
+    .line 17104922
+    .line 17104923
+    .line 17104924
+    move-result p0
+
+    .line 17104925
+    if-eqz p0, :cond_0
+
+    .line 17104926
+    .line 17104927
+    new-instance v2, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104928
+    .line 17104929
+    invoke-direct {v2, v1, v1, v0, v1}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;-><init>(Lcom/bytedance/ies/argus/strategy/a;Lcom/bytedance/ies/argus/bean/a;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    .line 17104930
+    .line 17104931
+    .line 17104932
+    sget-object v3, Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;->PASS_BY_SEC_LINK_HANDLE:Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;
+
+    .line 17104933
+    .line 17104934
+    const/4 v4, 0x0
+
+    .line 17104935
+    const/4 v5, 0x0
+
+    .line 17104936
+    const/4 v6, 0x6
+
+    .line 17104937
+    const/4 v7, 0x0
+
+    .line 17104938
+    invoke-static/range {v2 .. v7}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onPass$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104939
+    .line 17104940
+    .line 17104941
+    move-result-object p0
+
+    .line 17104942
+    goto :goto_0
+
+    .line 17104943
+    :cond_0
+    new-instance p0, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104944
+    .line 17104945
+    invoke-direct {p0, v1, v1, v0, v1}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;-><init>(Lcom/bytedance/ies/argus/strategy/a;Lcom/bytedance/ies/argus/bean/a;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    .line 17104946
+    .line 17104947
+    .line 17104948
+    sget-object v1, Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;->BLOCK_BY_SEC_LINK_HANDLE:Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;
+
+    .line 17104949
+    .line 17104950
+    const/4 v2, 0x0
+
+    .line 17104951
+    const/4 v3, 0x0
+
+    .line 17104952
+    const/4 v4, 0x6
+
+    .line 17104953
+    const/4 v5, 0x0
+
+    .line 17104954
+    move-object v0, p0
+
+    .line 17104955
+    invoke-static/range {v0 .. v5}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onBlock$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104956
+    .line 17104957
+    .line 17104958
+    move-result-object p0
+
+    .line 17104959
+    :goto_0
+    return-object p0
+
+    .line 17104960
+    :cond_1
+    new-instance p0, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104961
+    .line 17104962
+    invoke-direct {p0, v1, v1, v0, v1}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;-><init>(Lcom/bytedance/ies/argus/strategy/a;Lcom/bytedance/ies/argus/bean/a;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    .line 17104963
+    .line 17104964
+    .line 17104965
+    sget-object v1, Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;->SEC_LINK_STRATEGY_IS_NULL:Lcom/bytedance/ies/argus/bean/ArgusCommonVerifyReason;
+
+    .line 17104966
+    .line 17104967
+    const/4 v2, 0x0
+
+    .line 17104968
+    const/4 v3, 0x0
+
+    .line 17104969
+    const/4 v4, 0x6
+
+    .line 17104970
+    const/4 v5, 0x0
+
+    .line 17104971
+    move-object v0, p0
+
+    .line 17104972
+    invoke-static/range {v0 .. v5}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onPass$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 17104973
+    .line 17104974
+    .line 17104975
+    move-result-object p0
+
+    .line 17104976
+    return-object p0
+.end method
+
+.method public static final d(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;)V
+    .locals 8
+
+    .prologue
+    .line 33882112
+    const-string v0, "<this>"
+
+    .line 33882113
+    .line 33882114
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 33882115
+    .line 33882116
+    .line 33882117
+    const-string p0, "params"
+
+    .line 33882118
+    .line 33882119
+    invoke-static {p1, p0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 33882120
+    .line 33882121
+    .line 33882122
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;->d()Ljava/lang/String;
+
+    .line 33882123
+    .line 33882124
+    .line 33882125
+    move-result-object p0
+
+    .line 33882126
+    if-eqz p0, :cond_3
+
+    .line 33882127
+    .line 33882128
+    sget-object v0, Lcom/bytedance/sdk/xbridge/cn/auth/PermissionConfigV2Parser;->a:Lcom/bytedance/sdk/xbridge/cn/auth/PermissionConfigV2Parser;
+
+    .line 33882129
+    .line 33882130
+    const/4 v1, 0x2
+
+    .line 33882131
+    const/4 v2, 0x0
+
+    .line 33882132
+    invoke-static {v0, p0, v2, v1, v2}, Lcom/bytedance/sdk/xbridge/cn/auth/PermissionConfigV2Parser;->i(Lcom/bytedance/sdk/xbridge/cn/auth/PermissionConfigV2Parser;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ljava/util/List;
+
+    .line 33882133
+    .line 33882134
+    .line 33882135
+    move-result-object p0
+
+    .line 33882136
+    invoke-interface {p0}, Ljava/util/List;->iterator()Ljava/util/Iterator;
+
+    .line 33882137
+    .line 33882138
+    .line 33882139
+    move-result-object p0
+
+    .line 33882140
+    :cond_0
+    invoke-interface {p0}, Ljava/util/Iterator;->hasNext()Z
+
+    .line 33882141
+    .line 33882142
+    .line 33882143
+    move-result v0
+
+    .line 33882144
+    if-eqz v0, :cond_1
+
+    .line 33882145
+    .line 33882146
+    invoke-interface {p0}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+
+    .line 33882147
+    .line 33882148
+    .line 33882149
+    move-result-object v0
+
+    .line 33882150
+    check-cast v0, Lcom/bytedance/sdk/xbridge/cn/auth/bean/b;
+
+    .line 33882151
+    .line 33882152
+    invoke-virtual {v0}, Lcom/bytedance/sdk/xbridge/cn/auth/bean/b;->c()Ljava/lang/Long;
+
+    .line 33882153
+    .line 33882154
+    .line 33882155
+    move-result-object v1
+
+    .line 33882156
+    if-eqz v1, :cond_0
+
+    .line 33882157
+    .line 33882158
+    invoke-virtual {v1}, Ljava/lang/Long;->longValue()J
+
+    .line 33882159
+    .line 33882160
+    .line 33882161
+    move-result-wide v3
+
+    .line 33882162
+    const-wide/16 v5, 0x0
+
+    .line 33882163
+    .line 33882164
+    cmp-long v7, v3, v5
+
+    .line 33882165
+    .line 33882166
+    if-lez v7, :cond_0
+
+    .line 33882167
+    .line 33882168
+    sget-object v3, Lcom/bytedance/ies/argus/util/CommonUtils;->a:Lcom/bytedance/ies/argus/util/CommonUtils;
+
+    .line 33882169
+    .line 33882170
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;->b()Ljava/lang/String;
+
+    .line 33882171
+    .line 33882172
+    .line 33882173
+    move-result-object v4
+
+    .line 33882174
+    invoke-virtual {v0}, Lcom/bytedance/sdk/xbridge/cn/auth/bean/b;->e()Ljava/lang/String;
+
+    .line 33882175
+    .line 33882176
+    .line 33882177
+    move-result-object v0
+
+    .line 33882178
+    invoke-virtual {v3, v4, v0}, Lcom/bytedance/ies/argus/util/CommonUtils;->i(Ljava/lang/String;Ljava/lang/String;)Z
+
+    .line 33882179
+    .line 33882180
+    .line 33882181
+    move-result v0
+
+    .line 33882182
+    if-eqz v0, :cond_0
+
+    .line 33882183
+    .line 33882184
+    move-object v2, v1
+
+    .line 33882185
+    :cond_1
+    if-eqz v2, :cond_2
+
+    .line 33882186
+    .line 33882187
+    invoke-virtual {v2}, Ljava/lang/Long;->longValue()J
+
+    .line 33882188
+    .line 33882189
+    .line 33882190
+    move-result-wide v0
+
+    .line 33882191
+    goto :goto_0
+
+    .line 33882192
+    :cond_2
+    sget-object p0, Lcom/bytedance/ies/argus/bean/ArgusFeId;->NOT_MATCH:Lcom/bytedance/ies/argus/bean/ArgusFeId;
+
+    .line 33882193
+    .line 33882194
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/bean/ArgusFeId;->getLongValue()J
+
+    .line 33882195
+    .line 33882196
+    .line 33882197
+    move-result-wide v0
+
+    .line 33882198
+    :goto_0
+    invoke-virtual {p1, v0, v1}, Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;->u(J)V
+
+    .line 33882199
+    .line 33882200
+    .line 33882201
+    :cond_3
+    return-void
+.end method
+
+.method public static final e(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Ljava/lang/String;Ljava/util/Map;)V
+    .locals 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/bytedance/ies/argus/api/ArgusWebDelegate;",
+            "Ljava/lang/String;",
+            "Ljava/util/Map<",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            ">;)V"
+        }
+    .end annotation
+
+    .prologue
+    .line 50593792
+    const-string v0, "<this>"
+
+    .line 50593793
+    .line 50593794
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 50593795
+    .line 50593796
+    .line 50593797
+    const-string v0, "url"
+
+    .line 50593798
+    .line 50593799
+    invoke-static {p1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 50593800
+    .line 50593801
+    .line 50593802
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 50593803
+    .line 50593804
+    .line 50593805
+    move-result-object v0
+
+    .line 50593806
+    invoke-virtual {v0}, Lcom/bytedance/ies/argus/aspect/eventCenter/f;->r()Ljava/lang/String;
+
+    .line 50593807
+    .line 50593808
+    .line 50593809
+    move-result-object v0
+
+    .line 50593810
+    invoke-static {v0, p1}, Lkotlin/jvm/internal/Intrinsics;->areEqual(Ljava/lang/Object;Ljava/lang/Object;)Z
+
+    .line 50593811
+    .line 50593812
+    .line 50593813
+    move-result v0
+
+    .line 50593814
+    if-eqz v0, :cond_0
+
+    .line 50593815
+    .line 50593816
+    return-void
+
+    .line 50593817
+    :cond_0
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 50593818
+    .line 50593819
+    .line 50593820
+    move-result-object v0
+
+    .line 50593821
+    invoke-virtual {v0, p1}, Lcom/bytedance/ies/argus/aspect/eventCenter/f;->v(Ljava/lang/String;)V
+
+    .line 50593822
+    .line 50593823
+    .line 50593824
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 50593825
+    .line 50593826
+    .line 50593827
+    move-result-object p0
+
+    .line 50593828
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/aspect/eventCenter/a;->j()Landroid/view/View;
+
+    .line 50593829
+    .line 50593830
+    .line 50593831
+    move-result-object p0
+
+    .line 50593832
+    check-cast p0, Landroid/webkit/WebView;
+
+    .line 50593833
+    .line 50593834
+    if-eqz p0, :cond_1
+
+    .line 50593835
+    .line 50593836
+    new-instance v0, Lcom/ss/android/ugc/bytex/taskmonitor/proxy/HandlerDelegate;
+
+    .line 50593837
+    .line 50593838
+    invoke-static {}, Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
+
+    .line 50593839
+    .line 50593840
+    .line 50593841
+    move-result-object v1
+
+    .line 50593842
+    invoke-direct {v0, v1}, Lcom/ss/android/ugc/bytex/taskmonitor/proxy/HandlerDelegate;-><init>(Landroid/os/Looper;)V
+
+    .line 50593843
+    .line 50593844
+    .line 50593845
+    new-instance v1, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt$a;
+
+    .line 50593846
+    .line 50593847
+    invoke-direct {v1, p0, p2, p1}, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt$a;-><init>(Landroid/webkit/WebView;Ljava/util/Map;Ljava/lang/String;)V
+
+    .line 50593848
+    .line 50593849
+    .line 50593850
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+
+    .line 50593851
+    .line 50593852
+    .line 50593853
+    :cond_1
+    return-void
+.end method
+
+.method public static synthetic f(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)V
+    .locals 0
+
+    .prologue
+    .line 84017152
+    and-int/lit8 p3, p3, 0x2
+
+    .line 84017153
+    .line 84017154
+    if-eqz p3, :cond_0
+
+    .line 84017155
+    .line 84017156
+    const/4 p2, 0x0
+
+    .line 84017157
+    :cond_0
+    invoke-static {p0, p1, p2}, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt;->e(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Ljava/lang/String;Ljava/util/Map;)V
+
+    .line 84017158
+    .line 84017159
+    .line 84017160
+    return-void
+.end method
+
+.method public static final g(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Ljava/lang/String;Ljava/lang/String;)V
+    .locals 2
+
+    .prologue
+    .line 50593792
+    const-string v0, "<this>"
+
+    .line 50593793
+    .line 50593794
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 50593795
+    .line 50593796
+    .line 50593797
+    const-string v0, "title"
+
+    .line 50593798
+    .line 50593799
+    invoke-static {p1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 50593800
+    .line 50593801
+    .line 50593802
+    const-string v0, "msg"
+
+    .line 50593803
+    .line 50593804
+    invoke-static {p2, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 50593805
+    .line 50593806
+    .line 50593807
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 50593808
+    .line 50593809
+    .line 50593810
+    move-result-object p0
+
+    .line 50593811
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/aspect/eventCenter/a;->j()Landroid/view/View;
+
+    .line 50593812
+    .line 50593813
+    .line 50593814
+    move-result-object p0
+
+    .line 50593815
+    check-cast p0, Landroid/webkit/WebView;
+
+    .line 50593816
+    .line 50593817
+    if-eqz p0, :cond_0
+
+    .line 50593818
+    .line 50593819
+    new-instance v0, Lcom/ss/android/ugc/bytex/taskmonitor/proxy/HandlerDelegate;
+
+    .line 50593820
+    .line 50593821
+    invoke-static {}, Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
+
+    .line 50593822
+    .line 50593823
+    .line 50593824
+    move-result-object v1
+
+    .line 50593825
+    invoke-direct {v0, v1}, Lcom/ss/android/ugc/bytex/taskmonitor/proxy/HandlerDelegate;-><init>(Landroid/os/Looper;)V
+
+    .line 50593826
+    .line 50593827
+    .line 50593828
+    new-instance v1, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt$b;
+
+    .line 50593829
+    .line 50593830
+    invoke-direct {v1, p0, p1, p2}, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt$b;-><init>(Landroid/webkit/WebView;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 50593831
+    .line 50593832
+    .line 50593833
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+
+    .line 50593834
+    .line 50593835
+    .line 50593836
+    :cond_0
+    return-void
+.end method
+
+.method public static final h(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Lcom/bytedance/ies/argus/bean/AspectContext;)V
+    .locals 1
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/bytedance/ies/argus/api/ArgusWebDelegate;",
+            "Lcom/bytedance/ies/argus/bean/AspectContext<",
+            "**>;)V"
+        }
+    .end annotation
+
+    .prologue
+    .line 33751040
+    const-string v0, "<this>"
+
+    .line 33751041
+    .line 33751042
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 33751043
+    .line 33751044
+    .line 33751045
+    const-string v0, "context"
+
+    .line 33751046
+    .line 33751047
+    invoke-static {p1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 33751048
+    .line 33751049
+    .line 33751050
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->q()Lcom/bytedance/ies/argus/aspect/eventCenter/f;
+
+    .line 33751051
+    .line 33751052
+    .line 33751053
+    move-result-object p0
+
+    .line 33751054
+    invoke-virtual {p1, p0}, Lcom/bytedance/ies/argus/bean/AspectContext;->x(Lcom/bytedance/ies/argus/aspect/eventCenter/a;)V
+
+    .line 33751055
+    .line 33751056
+    .line 33751057
+    sget-object p0, Lcom/bytedance/ies/argus/base/ArgusMonitor;->a:Lcom/bytedance/ies/argus/base/ArgusMonitor;
+
+    .line 33751058
+    .line 33751059
+    invoke-virtual {p0, p1}, Lcom/bytedance/ies/argus/base/ArgusMonitor;->g(Lcom/bytedance/ies/argus/bean/AspectContext;)V
+
+    .line 33751060
+    .line 33751061
+    .line 33751062
+    return-void
+.end method
+
+.method public static final i(Lcom/bytedance/ies/argus/api/ArgusWebDelegate;Lcom/bytedance/ies/argus/bean/AspectContext;)Lkotlin/jvm/functions/Function0;
+    .locals 10
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/bytedance/ies/argus/api/ArgusWebDelegate;",
+            "Lcom/bytedance/ies/argus/bean/AspectContext<",
+            "Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;",
+            "Lcom/bytedance/ies/argus/api/params/o;",
+            ">;)",
+            "Lkotlin/jvm/functions/Function0<",
+            "Ljava/lang/String;",
+            ">;"
+        }
+    .end annotation
+
+    .prologue
+    .line 33882112
+    const-string v0, "<this>"
+
+    .line 33882113
+    .line 33882114
+    invoke-static {p0, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 33882115
+    .line 33882116
+    .line 33882117
+    const-string v0, "context"
+
+    .line 33882118
+    .line 33882119
+    invoke-static {p1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 33882120
+    .line 33882121
+    .line 33882122
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/ArgusWebDelegate;->p()Lcom/bytedance/ies/argus/plugin/SecLinkPluginHandler;
+
+    .line 33882123
+    .line 33882124
+    .line 33882125
+    move-result-object v0
+
+    .line 33882126
+    const/4 v1, 0x0
+
+    .line 33882127
+    if-nez v0, :cond_0
+
+    .line 33882128
+    .line 33882129
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/bean/AspectContext;->p()Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 33882130
+    .line 33882131
+    .line 33882132
+    move-result-object v2
+
+    .line 33882133
+    sget-object v3, Lcom/bytedance/ies/argus/bean/ArgusWebLoadVerifyReason;->SEC_LINK_HANDLER_IS_NULL:Lcom/bytedance/ies/argus/bean/ArgusWebLoadVerifyReason;
+
+    .line 33882134
+    .line 33882135
+    const/4 v4, 0x0
+
+    .line 33882136
+    const/4 v5, 0x0
+
+    .line 33882137
+    const/4 v6, 0x6
+
+    .line 33882138
+    const/4 v7, 0x0
+
+    .line 33882139
+    invoke-static/range {v2 .. v7}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onError$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 33882140
+    .line 33882141
+    .line 33882142
+    goto :goto_2
+
+    .line 33882143
+    :cond_0
+    invoke-virtual {v0, p1}, Lcom/bytedance/ies/argus/plugin/SecLinkPluginHandler;->g(Lcom/bytedance/ies/argus/bean/AspectContext;)Lkotlin/Pair;
+
+    .line 33882144
+    .line 33882145
+    .line 33882146
+    move-result-object v2
+
+    .line 33882147
+    invoke-virtual {v2}, Lkotlin/Pair;->component1()Ljava/lang/Object;
+
+    .line 33882148
+    .line 33882149
+    .line 33882150
+    move-result-object v3
+
+    .line 33882151
+    move-object v6, v3
+
+    .line 33882152
+    check-cast v6, Lcom/bytedance/ies/argus/bean/a;
+
+    .line 33882153
+    .line 33882154
+    invoke-virtual {v2}, Lkotlin/Pair;->component2()Ljava/lang/Object;
+
+    .line 33882155
+    .line 33882156
+    .line 33882157
+    move-result-object v2
+
+    .line 33882158
+    move-object v9, v2
+
+    .line 33882159
+    check-cast v9, Ljava/lang/String;
+
+    .line 33882160
+    .line 33882161
+    invoke-virtual {v6}, Lcom/bytedance/ies/argus/bean/a;->a()Z
+
+    .line 33882162
+    .line 33882163
+    .line 33882164
+    move-result v2
+
+    .line 33882165
+    if-eqz v2, :cond_3
+
+    .line 33882166
+    .line 33882167
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/bean/AspectContext;->n()Z
+
+    .line 33882168
+    .line 33882169
+    .line 33882170
+    move-result v2
+
+    .line 33882171
+    if-nez v2, :cond_1
+
+    .line 33882172
+    .line 33882173
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/bean/AspectContext;->h()Lcom/bytedance/ies/argus/bean/d;
+
+    .line 33882174
+    .line 33882175
+    .line 33882176
+    move-result-object v2
+
+    .line 33882177
+    invoke-virtual {v0, v2}, Lcom/bytedance/ies/argus/plugin/SecLinkPluginHandler;->f(Lcom/bytedance/ies/argus/bean/d;)Z
+
+    .line 33882178
+    .line 33882179
+    .line 33882180
+    move-result v0
+
+    .line 33882181
+    if-eqz v0, :cond_1
+
+    .line 33882182
+    .line 33882183
+    const/4 v0, 0x1
+
+    .line 33882184
+    goto :goto_0
+
+    .line 33882185
+    :cond_1
+    const/4 v0, 0x0
+
+    .line 33882186
+    :goto_0
+    new-instance v2, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt$usePluginVerifyLoadUrl$verifyBlock$1;
+
+    .line 33882187
+    .line 33882188
+    move-object v4, v2
+
+    .line 33882189
+    move-object v5, p1
+
+    .line 33882190
+    move-object v7, p0
+
+    .line 33882191
+    move v8, v0
+
+    .line 33882192
+    invoke-direct/range {v4 .. v9}, Lcom/bytedance/ies/argus/aspect/ArgusWebDefaultDelegateKt$usePluginVerifyLoadUrl$verifyBlock$1;-><init>(Lcom/bytedance/ies/argus/bean/AspectContext;Lcom/bytedance/ies/argus/bean/a;Lcom/bytedance/ies/argus/api/ArgusWebDelegate;ZLjava/lang/String;)V
+
+    .line 33882193
+    .line 33882194
+    .line 33882195
+    if-eqz v0, :cond_2
+
+    .line 33882196
+    .line 33882197
+    invoke-interface {v2}, Lkotlin/jvm/functions/Function0;->invoke()Ljava/lang/Object;
+
+    .line 33882198
+    .line 33882199
+    .line 33882200
+    goto :goto_1
+
+    .line 33882201
+    :cond_2
+    move-object v1, v2
+
+    .line 33882202
+    :goto_1
+    return-object v1
+
+    .line 33882203
+    :cond_3
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/bean/AspectContext;->g()Lcom/bytedance/ies/argus/api/params/BaseAspectParams;
+
+    .line 33882204
+    .line 33882205
+    .line 33882206
+    move-result-object p0
+
+    .line 33882207
+    check-cast p0, Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;
+
+    .line 33882208
+    .line 33882209
+    invoke-virtual {p0}, Lcom/bytedance/ies/argus/api/params/WebLoadUrlParams;->r()Z
+
+    .line 33882210
+    .line 33882211
+    .line 33882212
+    move-result p0
+
+    .line 33882213
+    if-nez p0, :cond_4
+
+    .line 33882214
+    .line 33882215
+    invoke-virtual {p1}, Lcom/bytedance/ies/argus/bean/AspectContext;->p()Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 33882216
+    .line 33882217
+    .line 33882218
+    move-result-object v2
+
+    .line 33882219
+    sget-object v3, Lcom/bytedance/ies/argus/bean/ArgusWebLoadVerifyReason;->SEC_LINK_VERIFY_MODE_NOT_ENABLE:Lcom/bytedance/ies/argus/bean/ArgusWebLoadVerifyReason;
+
+    .line 33882220
+    .line 33882221
+    const/4 v4, 0x0
+
+    .line 33882222
+    const/4 v5, 0x0
+
+    .line 33882223
+    const/4 v6, 0x6
+
+    .line 33882224
+    const/4 v7, 0x0
+
+    .line 33882225
+    invoke-static/range {v2 .. v7}, Lcom/bytedance/ies/argus/bean/AspectVerifyResult;->onError$default(Lcom/bytedance/ies/argus/bean/AspectVerifyResult;Lcom/bytedance/ies/argus/bean/e;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Lcom/bytedance/ies/argus/bean/AspectVerifyResult;
+
+    .line 33882226
+    .line 33882227
+    .line 33882228
+    :cond_4
+    :goto_2
+    return-object v1
+.end method
